@@ -102,6 +102,11 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg,
     ReleaseDC(hWnd, hDC);
     SelectObject(hMemDC, hBm);
     return 0;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+    EndPaint(hWnd, &ps);
+    return 0;
   case WM_TIMER:
     GetCursorPos(&pt);
     ScreenToClient(hWnd, &pt);
