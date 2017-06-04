@@ -4,9 +4,6 @@
  * PURPOSE: Eyes drawing program.
  */
 
-/* T01_EYES.c
-  programmer: GD5
-  WinApi*/
 
 #include <windows.h>
 #include <math.h>
