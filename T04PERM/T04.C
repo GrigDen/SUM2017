@@ -5,46 +5,58 @@
  */
 
 #include <stdio.h>
-#define max  50
-int p[max];
+#define max 15
 
+int p[max], parity, n;
+
+void Swap( int *A, int *B )
+{
+  int tmp = *A;
+
+  *A = *B;
+  *B = tmp;
+}
 void PrintPerm( void )
 { 
   int i;
-  FILE *F;
+  FILE *f;
+
   f = fopen("Perm.TXT","a");
   if (f == NULL)
     return;
   for (i = 0; i < n; i++)
     fprintf(f, "%i", p[i]);
-  fprintf(f,"-%s\n", parity ?"odd" : "even"
+  fprintf(f,"-%s\n", parity ? "odd" : "even");
   fclose(f);
 }
 
 void Go( int Pos )
 {
   int i;
+
   if (Pos >= n)
+  {
+    PrintPerm();
     return;
+  }
   for (i = Pos; i < n; i++)
   {  
-    Swap(&p[pos], &p[i]);
+    Swap(&p[Pos], &p[i]);
+    if (Pos != i)
+      parity = !parity;
     Go(Pos + 1);
-    Swap((&p[Pos], &p[i]);
+    Swap(&p[Pos], &p[i]);
+    if (Pos != i)
+      parity = !parity;
   }
-}
-
-void Swap( *A, *B)
-{
-  int tmp = *A;
-  *A = *B;
-  *B = tmp;
 }
 
 void main( void )
 {
-  int n, i;
-  scanf("%i", &n);
+  int i;
+
+  n = 3;
+  parity = 0;
   for (i = 0; i < n; i++)
     p[i] = i + 1;
   Go(0);
