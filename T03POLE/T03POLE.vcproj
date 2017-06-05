@@ -2,11 +2,11 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="T02_Clock"
-	ProjectGUID="{7E671DEC-CEC1-4587-AC66-48D0FFE47905}"
-	RootNamespace="T02_Clock"
+	Name="T03POLE"
+	ProjectGUID="{A7B4C0B7-BF23-4332-A14C-FA0049463D08}"
+	RootNamespace="T03POLE"
 	Keyword="Win32Proj"
-	TargetFrameworkVersion="131072"
+	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
 		<Platform
@@ -179,11 +179,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\T02_Clock.C"
+				RelativePath=".\POLE.C"
 				>
 			</File>
 			<File
-				RelativePath=".\T02CLOCK.C"
+				RelativePath=".\POLE.h"
+				>
+			</File>
+			<File
+				RelativePath=".\T03POLE.C"
 				>
 			</File>
 		</Filter>

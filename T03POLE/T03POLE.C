@@ -1,4 +1,4 @@
-/* FILE NAME: T02CLOCK.C
+/* FILE NAME: T01EYES.C
  * PROGRAMMER: DG5
  * DATE: 01.06.2017
  * PURPOSE: Eyes drawing program.
@@ -56,72 +56,75 @@ INT WINAPI WinMain( HINSTANCE hInstance,
   return msg.wParam;
 }/*End of "WinMain" function */
 
-               
-LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg,
-                               WPARAM wParam, LPARAM lParam )
+ 
+
+
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
-  BITMAP Bm;
+
+  INT x, y, i;
   POINT pt;
   PAINTSTRUCT ps;
-  INT x, y, i;
-  static HDC hMemDC, hMemDCLogo;   
+  static HDC hMemDC;   
   static INT w, h;
-  static HBITMAP hBm, hBmXOR, hBmAND;
-  SYSTEMTIME st;
-  FLOAT t, sec, min, hour;
+  static HBITMAP hBm;
 
-  switch(Msg)
+  switch (Msg)
   {
   case WM_CREATE:
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
-    hMemDCLogo = CreateCompatibleDC(hDC);
-    ReleaseDC(hWnd, hDC); 
+    ReleaseDC(hWnd, hDC);
     hBm = NULL;
-    hBmAND = LoadImage(NULL, "AND.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    hBmXOR = LoadImage(NULL, "XOR.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     SetTimer(hWnd, 47, 30, NULL);
     return 0;
   case WM_SIZE:
     w = LOWORD(lParam);
-    h = HIWORD(lParam);      
+    h = HIWORD(lParam);
     if (hBm != NULL)
       DeleteObject(hBm);
     hDC = GetDC(hWnd);
     hBm = CreateCompatibleBitmap(hDC, w, h);
     ReleaseDC(hWnd, hDC);
-    
     SelectObject(hMemDC, hBm);
     SendMessage(hWnd, WM_TIMER, 47, 0);
     return 0;
-  case WM_LBUTTONDOWN:
-    InvalidateRect(hWnd, NULL, FALSE);
-    return 0;
-  case WM_TIMER:
-    GetObject(hBmXOR, sizeof(BITMAP), &Bm);
-    SelectObject(hMemDCLogo, hBmAND);
-    BitBlt(hDC, x, y, w - Bm.bmWidth, h - Bm.bmHeight, Bm.bmWidth, Bm.bmHeight, hMemDCLogo, SRCAND);
-    SelectObject(hMemDCLogo, hBmXOR);
-    BitBlt(hDC, x, y, w - Bm.bmWidth, h - Bm.bmHeight, Bm.bmWidth, Bm.bmHeight, hMemDCLogo, SRCINVERT);
-    InvalidateRect(hWnd, NULL, FALSE);      
-    return 0;
-  case WM_PAINT:
-    hDC = BeginPaint(hWnd, &ps);
-    SelectObject(hMemDCLogo, hBmAND);
-    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
-    SelectObject(hMemDCLogo, hBmXOR);
-    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
 
-    EndPaint(hWnd, &ps);
-    return 0;
   case WM_KEYDOWN:
     if (wParam == VK_ESCAPE)
       DestroyWindow(hWnd);
     return 0;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+    EndPaint(hWnd, &ps);
+    return 0; 
+
+  case WM_TIMER:
+    GetCursorPos(&pt);
+    ScreenToClient(hWnd, &pt);
+
+    /*Drowing BackGroung */
+    SelectObject(hMemDC, GetStockObject(WHITE_BRUSH));
+    Rectangle(hMemDC, -1, -1, w + 1, h + 1);
+    InvalidateRect(hWnd, NULL, FALSE);
+    SelectObject(hMemDC, GetStockObject(NULL_BRUSH));
+
+    Rectangle(hMemDC, -1, -1, w + 1, h + 1);
+    srand(30);
+    /*Drowing Objects */
+    for (i = 0; i < 1; i++)
+    {
+      x = rand() % w;
+      y = rand() % h;
+      DrawArrow(hMemDC, x, y, 30, 20, pt.x, pt.y, w, h, hWnd); 
+    }
+    InvalidateRect(hWnd, NULL, FALSE);
+
+    return 0;
   case WM_ERASEBKGND:
     return 1;
-
   case WM_DESTROY:
     DeleteObject(hBm);
     DeleteDC(hMemDC);
@@ -130,6 +133,4 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg,
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
-}/*End of "MyWindowFunc" function*/
-
-
+} /* End of 'MyWindowFunc' fuction */
