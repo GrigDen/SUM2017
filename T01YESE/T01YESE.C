@@ -4,6 +4,131 @@
  * PURPOSE: Eyes drawing program.
  */
 
+#include <windows.h>
+#include <math.h>
+
+#define WND_CLASS_NAME "My second window"
+
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, 
+                              WPARAM wParam,LPARAM lParam );
+
+INT WINAPI WinMain( HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd)
+{
+ WNDCLASS wc;
+ HWND hWnd;
+ MSG msg;
+
+ wc.style = CS_VREDRAW | CS_HREDRAW;
+ wc.cbClsExtra = 0;
+ wc.cbWndExtra = 0;
+ wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+ wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+ wc.hIcon = LoadIcon(NULL, IDI_ERROR);
+ wc.lpszMenuName = NULL;
+ wc.hInstance = hInstance;
+ wc.lpfnWndProc = MyWindowFunc;
+ wc.lpszClassName = WND_CLASS_NAME;
+
+ /*Регистрация  кдасса в системе*/
+ if (!RegisterClass(&wc))
+ {
+   MessageBoxA(NULL, "Error register window class", "Error", MB_OK);
+   return 0;
+ }
+
+ /*Создание окна */
+ hWnd =
+   CreateWindow(WND_CLASS_NAME,
+     "Title",
+     WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+     CW_USEDEFAULT, CW_USEDEFAULT,
+     NULL, NULL, hInstance, NULL);
+
+ /*Показать и перерисовать окно*/
+ ShowWindow(hWnd, SW_SHOWNORMAL);
+ UpdateWindow(hWnd);
+
+ /*Цикл обработки сообщений пока не будет получено сщщбщение 'WM_QUIT'*/
+ while (GetMessage(&msg, NULL, 0, 0))
+ { 
+   /*обработка сообщений от клавиатуры */
+   TranslateMessage(&msg);
+   /*передача сообщений в функцию окна */
+   DispatchMessage(&msg);
+ }
+ return msg.wParam;
+}/*End of "WinMain" function */
+
+
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg,
+                              WPARAM wParam, LPARAM lParam )
+{
+ HDC hDC;
+ POINT pt;
+ PAINTSTRUCT ps;
+ static HDC hMemDC;   
+ static INT w, h;
+ static HBITMAP hBm;
+
+ switch(Msg)
+ {
+ case WM_CREATE:
+   hDC = GetDC(hWnd);
+   hMemDC = CreateCompatibleDC(hDC);
+   ReleaseDC(hWnd, hDC);
+   SetTimer(hWnd, 47, 30, NULL);
+   return 0;
+ case WM_SIZE:
+   w = LOWORD(lParam);
+   h = HIWORD(lParam);      
+   if (hBm != NULL)
+     DeleteObject(hBm);
+   hDC = GetDC(hWnd);
+   hBm = CreateCompatibleBitmap(hDC, w, h);
+   ReleaseDC(hWnd, hDC);
+
+   SelectObject(hMemDC, hBm);
+   Ellipse(hMemDC, 0, 0, w / 2, h / 2);
+   Ellipse(hMemDC, w / 2, h / 2, w, h);
+   return 0;
+ case WM_LBUTTONDOWN:
+   InvalidateRect(hWnd, NULL, FALSE);
+   return 0;
+ case WM_TIMER:
+   InvalidateRect(hWnd, NULL, FALSE);
+   return 0;
+ case WM_PAINT:
+   hDC = BeginPaint(hWnd, &ps);
+   BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
+   EndPaint(hWnd, &ps);
+   return 0;
+
+ /*  hDC = GetDC(hWnd);
+   Rectangle(hMemDC, -1, -1, w + 1, h + 1);
+   srand(30);
+   for (i = 0; i < 1000; i++)
+   {
+     x = rand() % w;
+     y = rand() % h;
+     DrawEye(hMemDC, x, y, 30, 10, pt.x, pt.y, w, h, hWnd);
+   } */ 
+ case WM_KEYDOWN:
+   if (wParam == VK_ESCAPE)
+     DestroyWindow(hWnd);
+   return 0;
+ case WM_ERASEBKGND:
+   return 1;
+
+ case WM_DESTROY:
+   DeleteObject(hBm);
+   DeleteDC(hMemDC);
+   KillTimer(hWnd, 47);
+   PostQuitMessage(0);
+   return 0;
+ }
+ return DefWindowProc(hWnd, Msg, wParam, lParam);
+}/*End of "MyWindowFunc" function*/
 
 #include <windows.h>
 #include <math.h>
