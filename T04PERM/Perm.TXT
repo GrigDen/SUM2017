@@ -1,0 +1,6 @@
+123-even
+132-odd
+213-odd
+231-even
+321-odd
+312-even
