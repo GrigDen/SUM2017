@@ -6,7 +6,7 @@
 
 #include <stdio.h>
 #include <math.h>
-#define Max 15
+//#define Max 15
 
 #pragma warning (disable: 4244)
 
