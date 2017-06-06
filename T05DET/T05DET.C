@@ -6,8 +6,8 @@
 
 #include <stdio.h>
 #include <math.h>
-//#define Max 15
-
+#define Max 15
+ /* kik warning */
 #pragma warning (disable: 4244)
 
 int p[Max], parity, n, sign = 1;
