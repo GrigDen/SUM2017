@@ -13,10 +13,17 @@
 #define INT BOOL
 
 typedef double DBL;
+
 typedef struct tagVEC
 {
   DBL x, y, z;
 } VEC;
+
+/* Matrix representation type */
+typedef struct tagMATR
+{
+  DBL A[3][3];
+} MATR;
 
 VOID BuildSphere( DBL R );
 VOID DrawSphere( HDC hDC, INT w, INT h);

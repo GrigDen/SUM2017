@@ -75,7 +75,7 @@ INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine
   /* register class */
   if (!RegisterClass(&wc))
   {
-    MessageBox(NULL, "...", "...", MB_OK);
+    MessageBox(NULL, "Error", "Title", MB_OK);
     return 0;
   }
 
