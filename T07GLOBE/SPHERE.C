@@ -77,7 +77,7 @@ VOID DrawSphere( HDC hDC, INT w, INT h )
 {
   DBL size = 1, wp = size, hp = size, xs, ys, t = clock() / (DBL)CLOCKS_PER_SEC , xp, yp;
   INT i, j;
-  VEC v = {1, 2, 3};
+  VEC v = {1, 2, 5};
   MATR m;
 
   m = MatrRotate ( t * 50, v);
@@ -92,19 +92,39 @@ VOID DrawSphere( HDC hDC, INT w, INT h )
   /* Matrix rotate*/
   SelectObject(hDC, GetStockObject(WHITE_BRUSH));
   SelectObject(hDC, GetStockObject(WHITE_PEN));
-  for (i = 0; i < GRID_H - 1; i++)
-    for (j = 0; j < GRID_W - 1; j++)
+  for (i = 0; i < GRID_H; i++)
+    for (j = 0; j < GRID_W; j++)
     {
+      POINT tmp[4];
       VEC p = VecTransform(G[i][j], m);
       xp = p.x;
       yp = p.y;
 
       Pts[i][j].x = xp * w / wp + w / 2;
       Pts[i][j].y = h / 2 - yp * h / hp;
-      Ellipse(hDC, Pts[i][j].x - 3, Pts[i][j].y - 3, Pts[i][j].x + 3, Pts[i][j].y + 3);
-    } 
+     // Ellipse(hDC, Pts[i][j].x - 3, Pts[i][j].y - 3, Pts[i][j].x + 3, Pts[i][j].y + 3);
+      
+      if (i > 0 && j > 0)
+      {
+        DBL s;
+        tmp[0] = Pts[i][j];
+        tmp[1] = Pts[i - 1][j];
+        tmp[2] = Pts[i - 1][j - 1];
+        tmp[3] = Pts[i][j - 1];
 
-    for (i = 0; i < GRID_H; i++)
+        s = (tmp[0].x - tmp[1].x) * (tmp[0].y + tmp[1].y) + 
+            (tmp[1].x - tmp[2].x) * (tmp[1].y + tmp[2].y) + 
+            (tmp[2].x - tmp[3].x) * (tmp[2].y + tmp[3].y) + 
+            (tmp[3].x - tmp[0].x) * (tmp[3].y + tmp[0].y);
+        SetDCPenColor(hDC, RGB(255, 25, 255));
+        SelectObject(hDC, GetStockObject(NULL_BRUSH));
+        if (s > 0)
+          Polygon(hDC, tmp, 4);
+        SelectObject(hDC, GetStockObject(WHITE_BRUSH));
+       } 
+
+
+    /*for (i = 0; i < GRID_H; i++)
       for (j = 0; j < GRID_W; j++)
       {
         POINT p[4];
@@ -115,18 +135,8 @@ VOID DrawSphere( HDC hDC, INT w, INT h )
         p[3] = Pts[i][j + 1];
 
         Polygon(hDC, p, 4);
-      }
- /* for (i = 0; i < GRID_H; i++)
-    for (j = 0; j < GRID_W; j++)
-    {
-      
-      xp = G[i][j].x * cos(t) - G[i][j].y * sin(t);
-      yp = G[i][j].x * sin(t) + G[i][j].y * cos(t);
-
-      xs = xp * w / wp + w / 2;
-      ys = h / 2 - yp * h / hp;
-      Ellipse(hDC, xs - 3, ys - 3, xs + 3, ys + 3);
-    } */
+      } */
+    }
   SelectObject(hDC, GetStockObject(NULL_BRUSH));
   SelectObject(hDC, GetStockObject(NULL_PEN));
 }/* End of 'DrawSphere'function */
