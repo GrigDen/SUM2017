@@ -1,241 +1,167 @@
-НАЧАЛО РЕАЛИЗАЦИИ:
-
-DEF.H
-  MemHandle
-  UINT64 INT64 (DBL FLT <-- VEC.H)
-
-MAIN.C - WinMain + WinFunc (работа с WinAPI)
-!!! все реализуется с префиксом ИФК (VG4)
-    AG4 DG5 AK5 NK5 AH5
-ANIM.C
-  VG4_Anim***
-  VG4_AnimInit( HWND hWnd );
-  VG4_AnimClose( VOID );
-  VG4_AnimResize( INT W, INT H );
-  VG4_AnimCopyFrame( HDC hDC );
-  VG4_AnimRender( VOID );
-  VG4_AnimAddUnit( vg4UNIT *Uni );
-  VG4_AnimFlipFullScreen( VOID );
-
-ANIM.H:
-+ VG4_Anim - глобальная переменная - структура контекста анимации типа vg4ANIM:
-typedef struct tagvg4ANIM
-{
-  ...
-} vg4ANIM;
-правильно:
-typedef struct tagvg4ANIM vg4ANIM; -> в начале файла
-typedef struct tagvg4UNIT vg4UNIT; -> в начале файла
-
-struct tagvg4ANIM
-{
-  HWND hWnd;                     - окно
-  HDC hDC;                       - контекст в памяти
-  INT W, H;                      - размер окна
-  HBITMAP hFrame;                - картинка кадра
-  vg4UNIT *Units[VG4_MAX_UNITS]; - массив объектов анимации
-  INT NumOfUnits;                - текущее количество объектов анимации
-};
-
-struct tagvg4UNIT
-{
-  /* Unit initialization function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Init)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit deinitialization function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Close)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit inter frame events handle function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Response)( vg4UNIT *Uni, vg4ANIM *Ani );
-
-  /* Unit render function.
-   * ARGUMENTS:
-   *   - self-pointer to unit object:
-   *       vg4UNIT *Uni;
-   *   - animation context:
-   *       vg4ANIM *Ani;
-   * RETURNS: None.
-   */
-  VOID (*Render)( vg4UNIT *Uni, vg4ANIM *Ani );
-};
-
-UNITS.C - вся базовая работа с объектами анимации
-
---- функции - "заглушки" - нужны для начальной инициализации любого объекта анимации по умолчанию
-
-/* Unit initialization function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
+/* FILE NAME: MAIN.C
+ * PROGRAMMER: GD5
+ * DATE: 07.06.2017
+ * PURPOSE: main.
  */
-static VOID VG4_UnitInit( vg4UNIT *Uni, vg4ANIM *Ani )
+
+#include "vec.h"
+#include "def.h"
+
+#pragma warning (disable: 4244)
+
+#define WND_CLASS_NAME "My window class"
+#define R 0.47
+
+INT DG5_MouseWheel;
+
+/* Forward references */
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, unsigned Message, WPARAM wParam, LPARAM lParam);
+static VOID FlipFullScreen( HWND hWnd )
 {
-} /* End of 'VG4_UnitInit' function */
-/* Unit deinitialization function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
- */
-static VOID VG4_UnitClose( vg4UNIT *Uni, vg4ANIM *Ani )
-{
-} /* End of 'VG4_UnitClose' function */
+  static BOOL IsFullScreen = FALSE;
+  static RECT SaveRect;
 
-/* Unit inter frame events handle function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
- */
-static VOID VG4_UnitResponse( vg4UNIT *Uni, vg4ANIM *Ani );
-{
-} /* End of 'VG4_UnitResponse' function */
-
-/* Unit render function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
- */
-static VOID VG4_UnitRender( vg4UNIT *Uni, vg4ANIM *Ani )
-{
-} /* End of 'VG4_UnitRender' function */
-
-- основная функция создания объекта анимации по умолчанию:
-
-/* Unit creation function.
- * ARGUMENTS:
- *   - unit structure size in bytes:
- *       INT Size;
- * RETURNS:
- *   (vg4UNIT *) pointer to created unit.
- */
-vg4UNIT * VG4_AnimUnitCreate( INT Size )
-{
-  vg4UNIT *Uni;
-
-  /* Memory allocation */
-  if (Size < sizeof(vg4UNIT) || (Uni = malloc(Size)) == NULL)
-    return NULL;
-  memset(Uni, 0, Size);
-  /* Setup unit methods */
-  Uni->Init = VG4_UnitInit;
-  Uni->Close = VG4_UnitClose;
-  Uni->Response = VG4_UnitResponse;
-  Uni->Render = VG4_UnitRender;
-  return Uni;
-} /* End of 'VG4_AnimUnitCreate' function */
-
-пример своего объекта анимации:
-
-U_BBALL.C
-
-#include "anim.h"
-
-typedef struct
-{
-  VG4_UNIT_BASE_FIELDS;
-  VEC Pos;
-} vg4UNIT_BALL;
-
-/* Unit ball initialization function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT_BALL *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
- */
-static VOID VG4_UnitInit( vg4UNIT_BALL *Uni, vg4ANIM *Ani )
-{
-  Uni->Pos = VecSet(0, 1, 0);
-} /* End of 'VG4_UnitInit' function */
-
-/* Unit render function.
- * ARGUMENTS:
- *   - self-pointer to unit object:
- *       vg4UNIT_BALL *Uni;
- *   - animation context:
- *       vg4ANIM *Ani;
- * RETURNS: None.
- */
-static VOID VG4_UnitRender( vg4UNIT_BALL *Uni, vg4ANIM *Ani )
-{
-  DrawSphere(Uni->Pos, 111);
-} /* End of 'VG4_UnitRender' function */
-
-/* Unit ball creation function.
- * ARGUMENTS: None.
- * RETURNS:
- *   (vg4UNIT *) pointer to created unit.
- */
-vg4UNIT * VG4_UnitCreateBall( VOID )
-{
-  vg4UNIT_BALL *Uni;
-
-  if ((Uni = (vg4UNIT_BALL *)VG4_AnimUnitCreate(sizeof(vg4UNIT_BALL))) == NULL)
-    return NULL;
-  /* Setup unit methods */
-  Uni->Init = VG4_UnitInit;
-  Uni->Render = VG4_UnitRender;
-  return (vg4UNIT *)Uni;
-} /* End of 'VG4_UnitCreateBall' function */
-
-UNITS.H
--- функции-конструкторы примеров:
-/* Unit ball creation function.
- * ARGUMENTS: None.
- * RETURNS:
- *   (vg4UNIT *) pointer to created unit.
- */
-vg4UNIT * VG4_UnitCreateBall( VOID );
-
-#include "units.h"
-WinMain:
-. . .
-  VG4_AnimAddUnit(VG4_UnitCreateBall());
-
-VG4_AnimRender:
-  . . . timer
-  . . . опросили все (kbd, mouse, joystick)
-  for (i = 0; i < VG4_Anim.NumOfUnits; i++)
-    VG4_Anim.Units[i]->Response(VG4_Anim.Units[i], &VG4_Anim);
-
-  . . . очищаем кадр
-  for (i = 0; i < VG4_Anim.NumOfUnits; i++)
+  if (IsFullScreen)
   {
-    . . . можно сбросить все кисти и перья
-    VG4_Anim.Units[i]->Render(VG4_Anim.Units[i], &VG4_Anim);
+    /* restore window size */
+    SetWindowPos(hWnd, HWND_TOP,
+      SaveRect.left, SaveRect.top,
+      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top,
+      SWP_NOOWNERZORDER);
   }
-  . . .
-}
+  else
+  {
+    /* Set full screen size to window */
+    HMONITOR hmon;
+    MONITORINFOEX moninfo;
+    RECT rc;
+
+    /* Store window old size */
+    GetWindowRect(hWnd, &SaveRect);
+
+    /* Get nearest monitor */
+    hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+
+    /* Obtain monitor info */
+    moninfo.cbSize = sizeof(moninfo);
+    GetMonitorInfo(hmon, (MONITORINFO *)&moninfo);
+
+    /* Set window new size */
+    rc = moninfo.rcMonitor;
+    AdjustWindowRect(&rc, GetWindowLong(hWnd, GWL_STYLE), FALSE);
+
+    SetWindowPos(hWnd, HWND_TOPMOST,
+      rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+      SWP_NOOWNERZORDER);
+  }
+  IsFullScreen = !IsFullScreen;
+} /* End of 'FlipFullScreen' function */
+
+/* Main program function */   
+INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd )
+{
+  WNDCLASS wc;
+  HWND hWnd;
+  MSG msg;
+
+  wc.style = CS_VREDRAW | CS_HREDRAW;
+  wc.cbClsExtra = 0;
+  wc.cbWndExtra = 0;
+  wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+  wc.hIcon = LoadIcon(NULL, IDI_ERROR);
+  wc.lpszMenuName = NULL;
+  wc.hInstance = hInstancce;
+  wc.lpfnWndProc = MyWindowFunc;
+  wc.lpszClassName = WND_CLASS_NAME;
+
+  /* register class */
+  if (!RegisterClass(&wc))
+  {
+    MessageBox(NULL, "Error", "Title", MB_OK);
+    return 0;
+  }
+
+  /* create window */
+  hWnd = CreateWindow(WND_CLASS_NAME, "Title", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstancce, NULL);
+
+  /* show and redraw window */
+  ShowWindow(hWnd, SW_SHOWNORMAL);
+  UpdateWindow(hWnd);
+
+  /* waiting message about 'WM_QUIT' */
+  while (GetMessage(&msg, NULL, 0, 0))
+  {
+    TranslateMessage(&msg);
+    DispatchMessage(&msg);
+  }
+  return msg.wParam;
+} /* End of 'WinMain' function */
+
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
+{
+  HDC hDC;
+  POINT pt;
+  PAINTSTRUCT ps;
+  MINMAXINFO *MinMax;
+  static INT w, h;
+  static HDC hMemDC;
+  static HBITMAP hBm;
+
+  switch (Msg)
+  {
+  case WM_GETMINMAXINFO:
+    MinMax = (MINMAXINFO *)lParam;
+    MinMax->ptMaxTrackSize.y =
+      GetSystemMetrics(SM_CYMAXTRACK) +
+      GetSystemMetrics(SM_CYCAPTION) +
+      GetSystemMetrics(SM_CYMENU) +
+      GetSystemMetrics(SM_CYBORDER) * 2;
+    return 0;
+  case WM_CREATE:
+    SetTimer(hWnd, 47, 30, NULL);
+    
+    DG5_AnimInit(hWnd);
+    return 0;
+  case WM_SIZE:
+    DG5_AnimResize(LOWORD(lParam), HIWORD(lParam));
+    DG5_AnimRender();
+    return 0;
+  case WM_MOUSEWHEEL:
+    DG5_MouseWheel += (SHORT)HIWORD(wParam);
+    return 0;
+
+  case WM_KEYDOWN:
+    if (wParam == VK_ESCAPE) /* press esc = exit*/
+      DestroyWindow(hWnd);
+    if (wParam == 'F') /* press F = fullscreen */
+      FlipFullScreen(hWnd);
+    return 0;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    DG5_AnimCopyFrame(hDC);
+    EndPaint(hWnd, &ps);
+    return 0;
+  case WM_TIMER:
+    /* draw background */
+    SelectObject(hMemDC, GetStockObject(BLACK_BRUSH));
+    Rectangle(hMemDC, -1, -1, w + 1, h + 1);
+    InvalidateRect(hWnd, NULL, FALSE);
+    SelectObject(hMemDC, GetStockObject(NULL_BRUSH));
+    /*End draw background */
+    DG5_AnimRender();
+    InvalidateRect(hWnd, NULL, FALSE);
+
+    return 0;
+  case WM_ERASEBKGND:
+    return 1;
+
+  case WM_DESTROY:
+    DG5_AnimClose();
+    PostQuitMessage(0);
+    return 0;
+  }
+  return DefWindowProc(hWnd, Msg, wParam, lParam);
+} /* End of 'MyWindowFunc' fuction */
+
+/* END OF 'T07GLOBE.C' FILE */

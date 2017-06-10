@@ -7,6 +7,8 @@
 #ifndef __DEF_H_
 #define __DEF_H_
 
+#include "vec.h"
+
 #pragma warning(disable: 4244 4305)
 
 /* Debug memory allocation support */
