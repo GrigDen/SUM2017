@@ -1,0 +1,91 @@
+/* FILE NAME: U_COW.C
+ * PROGRAMMER: DG5
+ * DATE: 10.06.2017
+ * PURPOSE: Units base functions.
+ */
+
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+
+#include "units.h"
+
+/* Animation unit representation type */
+typedef struct tagDG5UNIT_COW
+{
+  DG5_BASE_UNIT_FIELDS;
+  DG5OBJ3D Cow; /* Cow model */
+} DG5UNIT_COW;
+
+/* Cow drawing unit initialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       DG5UNIT_COW *Uni;
+ *   - animation context:
+ *       dg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID DG5_UnitInit( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+{
+  DG5_RndObjLoad(&Uni->Cow, "cow.object");
+} /* End of 'DG5_UnitInit' function */
+
+/* Cow drawing unit deinitialization function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       DG5UNIT_COW *Uni;
+ *   - animation context:
+ *       dg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID DG5_UnitClose( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+{
+  DG5_RndObjFree(&Uni->Cow);
+} /* End of 'DG5_UnitClose' function */
+
+/* Cow drawing unit inter frame events handle function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       DG5UNIT_COW *Uni;
+ *   - animation context:
+ *       dg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID DG5_UnitResponse( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+{
+} /* End of 'DG5_UnitResponse' function */
+
+/* Cow drawing unit render function.
+ * ARGUMENTS:
+ *   - self-pointer to unit object:
+ *       DG5UNIT_COW *Uni;
+ *   - animation context:
+ *       dg5ANIM *Ani;
+ * RETURNS: None.
+ */
+static VOID DG5_UnitRender( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+{
+  DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
+} /* End of 'DG5_UnitRender' function */
+
+/* Cow drawing unit creation function.
+ * ARGUMENTS: None.
+ * RETURNS:
+ *   (dg5UNIT *) pointer to created unit.
+ */
+dg5UNIT * DG5_UnitCreateCow( VOID )
+{
+  DG5UNIT_COW *Uni;
+
+  /* Memory allocation */
+  if ((Uni = (DG5UNIT_COW *)DG5_AnimUnitCreate(sizeof(DG5UNIT_COW))) == NULL)
+    return NULL;
+  /* Setup unit methods */
+  Uni->Init = (VOID *)DG5_UnitInit;
+  Uni->Close = (VOID *)DG5_UnitClose;
+  Uni->Response = (VOID *)DG5_UnitResponse;
+  Uni->Render = (VOID *)DG5_UnitRender;
+  return (dg5UNIT *)Uni;
+} /* End of 'DG5_UnitCreateCow' function */
+
+/* END OF 'U_COW.C' FILE */

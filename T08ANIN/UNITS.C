@@ -5,8 +5,6 @@
  */
 #include "anim.h"
 
-Static VOID DG5_Unit( dg5Unit *Uni, dg5Anim *Anim )
-#include "anim.h"
 
 /* Unit initialization function.
  * ARGUMENTS:
@@ -46,9 +44,9 @@ static VOID dg5_UnitResponse( dg5UNIT *Uni, dg5ANIM *Ani )
 /* Unit render function.
  * ARGUMENTS:
  *   - self-pointer to unit object:
- *       DG5UNIT *Uni;
+ *       dg5UNIT *Uni;
  *   - animation context:
- *       DG5ANIM *Ani;
+ *       dg5ANIM *Ani;
  * RETURNS: None.
  */
 static VOID dg5_UnitRender( dg5UNIT *Uni, dg5ANIM *Ani )
@@ -60,9 +58,9 @@ static VOID dg5_UnitRender( dg5UNIT *Uni, dg5ANIM *Ani )
  *   - unit structure size in bytes:
  *       INT Size;
  * RETURNS:
- *   (DG5UNIT *) pointer to created unit.
+ *   (dg5UNIT *) pointer to created unit.
  */
-dg5UNIT * dg5_AnimUnitCreate( INT Size )
+dg5UNIT * DG5_AnimUnitCreate( INT Size )
 {
   dg5UNIT *Uni;
 

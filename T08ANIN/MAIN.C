@@ -4,8 +4,7 @@
  * PURPOSE: main.
  */
 
-#include "vec.h"
-#include "def.h"
+#include "anim.h"
 
 #pragma warning (disable: 4244)
 
@@ -101,10 +100,8 @@ INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
-  POINT pt;
   PAINTSTRUCT ps;
   MINMAXINFO *MinMax;
-  static INT w, h;
   static HDC hMemDC;
   static HBITMAP hBm;
 
@@ -143,11 +140,6 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
     EndPaint(hWnd, &ps);
     return 0;
   case WM_TIMER:
-    /* draw background */
-    SelectObject(hMemDC, GetStockObject(BLACK_BRUSH));
-    Rectangle(hMemDC, -1, -1, w + 1, h + 1);
-    InvalidateRect(hWnd, NULL, FALSE);
-    SelectObject(hMemDC, GetStockObject(NULL_BRUSH));
     /*End draw background */
     DG5_AnimRender();
     InvalidateRect(hWnd, NULL, FALSE);

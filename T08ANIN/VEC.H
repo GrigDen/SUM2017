@@ -4,35 +4,67 @@
  * PURPOSE: drawing sphere.
  */
 
-#ifndef __VEC_H_
-#define __VEC_H_
+#ifndef VEC_H
+#define VEC_H
 
-#include <windows.h>
 #include <math.h>
+#include <windows.h> 
+                 
+#pragma warning(disable: 4244)
 
 #define PI 3.14159265358979323846
-#define D2R(A) ((A) * PI / 180))
+#define D2R(A) (A * PI / 180)
 #define Degree2Radian(a) D2R(a)
 
-#pragma warning (disable: 4244 4305)
-
 typedef double DBL;
+typedef struct tagMATR
+{
+  DBL a[4][4];
+} MATR;
 
 typedef struct tagVEC
 {
-  DBL M[4][4];
-}  MATR;
+  DBL x, y, z;
+} VEC;
+
 
 __inline VEC VecSet( DBL x, DBL y, DBL z )
 {
-  VEC v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  retutn v;
-} /* End of "VecSet" function */
+  VEC v = {x, y, z};
+  return v;
+}
 
-static MATR UnitMatrix =
+__inline VEC VecAddVec( VEC v1, VEC v2 )
+{
+  return VecSet(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+}
+
+__inline VEC VecSubVec( VEC v1, VEC v2 )
+{
+  return VecSet(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+}
+
+__inline VEC VecMulNum( VEC v, DBL n )
+{
+  return VecSet(v.x * n, v.y * n, v.z * n);
+}
+
+__inline VEC VecDivNum( VEC v, DBL n )
+{
+  return VecSet(v.x / n, v.y / n, v.z / n);
+}
+
+__inline VEC VecNeg( VEC v )
+{
+  return VecSet(-v.x, -v.y, -v.z );
+}
+
+__inline DBL VecDotVec( VEC v1, VEC v2 )
+{
+  return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+}
+
+static MATR UnitMatrix = 
 {
   {
     {1, 0, 0, 0},
@@ -40,136 +72,186 @@ static MATR UnitMatrix =
     {0, 0, 1, 0},
     {0, 0, 0, 1}
   }
+};
+
+__inline MATR MatrIdentity( VOID )
+{
+  return UnitMatrix;
 }
 
-__inline Matr MatrIdentiti( VOID )
+__inline DBL VecLen2( VEC v )
 {
-  return UintMatrix;
+  return v.x * v.x + v.y * v.y + v.z * v.z;
+}
 
-  m.A[3][0] = T.x;
-  m.A[3][1] = T.y;
-  m.A[3][2] = T.z;
+__inline DBL VecLen( VEC v )
+{
+  return sqrt(VecLen(v));
+}
+
+__inline VEC VecNormalize( VEC v )
+{
+  DBL l = VecLen(v);
+
+  return VecSet(v.x / l, v.y / l, v.z / l);
+}
+
+__inline MATR MatrMulMatr( MATR m1, MATR m2 )
+{
+  INT i, j, k;
+  MATR r;
+
+  for(i = 0; i < 4; i++)
+    for(j = 0; j < 4; j++)
+      for(r.a[i][j] = 0, k = 0; k < 4; k++)
+        r.a[i][j] += m1.a[i][k] * m2.a[k][j];
+  return r;
+}
+
+__inline MATR MatrTranspose( MATR m )
+{
+  INT i, j;
+  MATR r;
+
+  for(i = 0; i < 4; i++)
+    for(j = 0; j < 4; j++)
+      r.a[i][j] = r.a[j][i];
+  return r;
+}
+
+__inline DBL MatrDeterm3x3( DBL a11, DBL a12, DBL a13,
+                            DBL a21, DBL a22, DBL a23,
+                            DBL a31, DBL a32, DBL a33)
+{
+  return a11 * a22 * a33 - a11 * a23 * a32 - a12 * a21 * a33 + 
+         a12 * a23 * a31 + a13 * a21 * a32 - a13 * a22 * a31;
+}
+
+__inline DBL MatrDeterm( MATR m )
+{
+  return
+    m.a[0][0] * MatrDeterm3x3(m.a[1][1], m.a[1][2], m.a[1][3], 
+                              m.a[2][1], m.a[2][2], m.a[2][3], 
+                              m.a[3][1], m.a[3][2], m.a[3][3]) - 
+    m.a[0][1] * MatrDeterm3x3(m.a[1][0], m.a[1][2], m.a[1][3], 
+                              m.a[2][0], m.a[2][2], m.a[2][3], 
+                              m.a[3][0], m.a[3][2], m.a[3][3]) +
+    m.a[0][2] * MatrDeterm3x3(m.a[1][0], m.a[1][1], m.a[1][3], 
+                              m.a[2][0], m.a[2][1], m.a[2][3], 
+                              m.a[3][0], m.a[3][1], m.a[3][3]) - 
+    m.a[0][3] * MatrDeterm3x3(m.a[1][0], m.a[1][1], m.a[1][1], 
+                              m.a[2][0], m.a[2][1], m.a[2][1], 
+                              m.a[3][0], m.a[3][1], m.a[3][1]);
+}
+
+__inline MATR MatrInverse( MATR m )
+{
+  INT i, j, p[][3] = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}};
+  DBL det = MatrDeterm(m);
+  MATR r;
+
+  for(i = 0; i < 4; i++)
+    for(j = 0; j < 4; j++)
+      r.a[i][j] = 
+        MatrDeterm3x3(
+          m.a[p[i][0]][p[j][0]], m.a[p[i][0]][p[j][1]], m.a[p[i][0]][p[j][2]], 
+          m.a[p[i][1]][p[j][0]], m.a[p[i][1]][p[j][1]], m.a[p[i][1]][p[j][2]], 
+          m.a[p[i][2]][p[j][0]], m.a[p[i][2]][p[j][1]], m.a[p[i][2]][p[j][2]]) / 
+        det;
+  return r;
+}
+
+/* function MatrRotate */
+__inline MATR MatrRotate(DBL AngleDeg, VEC v )
+{
+  DBL a = D2R(AngleDeg), si = sin(a), co = cos(a);
+  MATR m;
+  VEC p = VecNormalize(v);
+  
+  m.a[0][0] = co + p.x * p.x * (1 - co);
+  m.a[0][1] = p.y * p.x * (1 - co) + p.z * si;
+  m.a[0][2] = p.z * p.x * (1 - co) - p.y * si;
+
+  m.a[1][0] = p.x * p.y * (1 - co) - p.z * si;
+  m.a[1][1] = co + p.y * p.y * (1 - co);
+  m.a[1][2] = p.z * p.y * (1 - co) + p.x * si;
+
+  m.a[2][0] = p.x * p.z * (1 - co) + p.y * si;
+  m.a[2][1] = p.y * p.z * (1 - co) - p.x * si;
+  m.a[2][2] = co + p.z * p.z * (1 -co);
+  
+  return m;
+} /* End of MatrRotate */
+
+__inline MATR MatrTranslate( VEC t )
+{
+  MATR m = UnitMatrix;
+
+  m.a[3][0] = t.x;
+  m.a[3][1] = t.y;
+  m.a[3][2] = t.z;
   return m;
 }
 
-MATR MatrScale( VEC S );
-MATR MatrRotateX( DBL AngleInDegree );
-MATR MatrRotateY( DBL AngleInDegree );
-MATR MatrRotateZ( DBL AngleInDegree );
-
-VEC VecAddVec( VEC V1, VEC V2 );
-VEC VecAddVec( VEC V1, VEC V2 );
-VEC VecAddVec( VEC V1, DBL N );
-VEC VecAddVec( VEC V1, DBL N );
-VEC VecNeg( VEC V );
-
-/* dotproduction of  vec*/
-DBL VecDotVec( Vec V1, VEC V2 );
-/* poduction of vec */
-VEC VecCrossVec( VEC V1, VEC V2 );
-
-DBL VecLen( VEC V );
-DBL VecLen2( VEC V );
-DBL VecNormolize( VEC V );
-
-VEC VecMulMatr( VEC V, MATR M );
-
-__inline VEC VecAddVecEq( VEC *VRes, VEC V2 );
+__inline MATR MatrScale( VEC s )
 {
-  VRes.x += V2.x;
-  VRes.y += V2.y;
-  VRes.z += V2.z;
-  
-  return *VRes;
+  MATR m = UnitMatrix;
+
+  m.a[0][0] = s.x;
+  m.a[1][1] = s.y;
+  m.a[2][2] = s.z;
+  return m;
 }
 
-VEC PointTransform( VEC V, MATR M);
-VECVectorTransform( VEC V, MATR M);
-
-/* SHAPING*/
-MATR Q = MatrTransform( VEC V, MATR M);
-N1 = VectorTransform(N, Q);
-
-__inline MATR MatrRotate ( DBL AngleInDegree, VEC R )
+__inline MATR MatrRotateZ( DBL AngleInDegree )
 {
-  DBL A = D2R (AngleToDegree), si = sin(A), co = cos(A);
-  VEC V = VecNormalize(R);
-  MATR M = 
-  {
-    {
-     {co + V.x * V.x * (1 - co), V.x * V.y * (1 - co) - V.z * si, V.x * V.z * (1 - co) + v.Y + si, 0},
-     {V.y * V.x * (1 - co) + V.z * si, co + V.y * V.y * (1 - co), V.y * V.z * (1 - co) - V.x * si, 0}, 
-     {V.z * V.x * (1 - co) - V.y * si, V.z * V.y * (1 - co) + V.x * si, co + V.z * V.z * (1 -co), 0},
-     {0, 0, 0, 1}
-    }
-   };
-   
-   return M;
+  MATR m = UnitMatrix;
+  DBL a = D2R(AngleInDegree);
+
+  m.a[0][0] = cos(a);
+  m.a[0][1] = sin(a);
+  m.a[1][0] = -sin(a);
+  m.a[1][1] = cos(a);
+  return m;
 }
 
-__inline MATR MatrMulMatr( MATR M1, MATR M2 )
+__inline MATR MatrRotateX( DBL AngleInDegree )
 {
-  MATR r; 
-   
-  for (i = 0; i < 4; i++)
-    for (j = 0; j < 4; j++)
-      for (r.A[i][j] = 0, k = 0; k < 4; k++)
-        r.A[i][j] += M1.A[i][j] * M2.A[k][j];
-  return r;
+  MATR m = UnitMatrix;
+  DBL a = D2R(AngleInDegree);
+
+  m.a[1][1] = cos(a);
+  m.a[1][2] = sin(a);
+  m.a[2][1] = -sin(a);
+  m.a[2][2] = cos(a);
+  return m;
 }
 
-MATR MatrTranspose( MATR M );
-
-DBL MatrDeterm3x3( DBL A11, DBL A12, DBL A13,
-                   DBL A21, DBL A22, DBL A23,
-                   DBL A31, DBL A23, DBL A33 )
-{ 
-  return A11 * A22 * A33 - A11 * A23 * A32 - A12 * A21 * A33 + A12 * A23 * A31 + A13 * A21 * A32 - A13 * A22 * A31;
-}
-
-DBL MatrDeterm( MATR M )
+__inline MATR MatrRotateY( DBL AngleInDegree )
 {
-  return
-    M.A[0][0] * MatrDeterm3x3(M.A[1][1], M.A[1][2], M.A[1][3],
-                              M.A[2][1], M.A[2][2], M.A[2][3],
-                              M.A[3][1], M.A[3][2], M.A[3][3],) -
-    M.A[0][0] * MatrDeterm3x3(M.A[1][1], M.A[1][2], M.A[1][3],
-                              M.A[2][1], M.A[2][2], M.A[2][3],
-                              M.A[3][1], M.A[3][2], M.A[3][3],) + 
-    M.A[0][0] * MatrDeterm3x3(M.A[1][1], M.A[1][2], M.A[1][3],
-                              M.A[2][1], M.A[2][2], M.A[2][3],
-                              M.A[3][1], M.A[3][2], M.A[3][3],) -
-    M.A[0][0] * MatrDeterm3x3(M.A[1][1], M.A[1][2], M.A[1][3],
-                              M.A[2][1], M.A[2][2], M.A[2][3],
-                              M.A[3][1], M.A[3][2], M.A[3][3],);
+  MATR m = UnitMatrix;
+  DBL a = D2R(AngleInDegree);
+
+  m.a[0][0] = cos(a);
+  m.a[0][2] = -sin(a);
+  m.a[2][0] = sin(a);
+  m.a[2][2] = cos(a);
+  return m;
 }
 
-MATR MatrInverse( MATR M )
+__inline VEC VecMulMatr( VEC v, MATR m )
 {
-  MATR r;
-  DBL det = MatrDeterm(M);
 
-  INT p[4][3] = {{1, 2, 3}, {0, 2, 3}, {0, 1, 2}};
-  
-  if (det == 0)
-    return UnitMatrix;
-  for (i == 0; i < 4; i++)
-    for (j == 0; j < 4; j++)
-      r.A[j][i] = 
-      MatrDeterm#x3(
-        M.A[p[i][0]][i[j][0]], M.A[p[i][0]][i[j][1]], M.A[p[i][0]][i[j][2]],
-        M.A[p[i][1]][i[j][0]], M.A[p[i][1]][i[j][1]], M.A[p[i][1]][i[j][2]],
-        M.A[p[i][2]][i[j][0]], M.A[p[i][2]][i[j][1]], M.A[p[i][2]][i[j][2]]) / det;
-  return r;
 }
 
-/* Matrix look-at viewer setup function.
- * ARGUMENTS:
- *   - viewer position, look-at point, approximate up direction:
- *       VEC Loc, At, Up1;
- * RETURNS:
- *   (MATR) result matrix.
- */
+
+
+__inline VEC VecCrossVec( VEC v1, VEC v2 )
+{
+  return VecSet(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
+}
+
+/* function MatrView */
 __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
 {
   VEC
@@ -189,54 +271,31 @@ __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
   return m;
 } /* End of 'MatrView' function */
 
-/* Vector by matrix multiplication (without projection) function.
- * ARGUMENTS:
- *   - source vector:
- *       VEC V;
- *   - multiplied matrix:
- *       MATR M;
- * RETURNS:
- *   (VEC) result vector.
- */
+/* function VecMulMatr43 */
 __inline VEC VecMulMatr43( VEC V, MATR M )
 {
-  return VecSet(V.x * M.A[0][0] + V.y * M.A[1][0] + V.z * M.A[2][0] + M.A[3][0],
-                V.x * M.A[0][1] + V.y * M.A[1][1] + V.z * M.A[2][1] + M.A[3][1],
-                V.x * M.A[0][2] + V.y * M.A[1][2] + V.z * M.A[2][2] + M.A[3][2]);
+  return VecSet(V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0] + M.a[3][0],
+                V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1] + M.a[3][1],
+                V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2] + M.a[3][2]);
 } /* End of 'VecMulMatr43' function */
 
-/* Vector by matrix multiplication (only orientation) function.
- * ARGUMENTS:
- *   - source vector:
- *       VEC V;
- *   - multiplied matrix:
- *       MATR M;
- * RETURNS:
- *   (VEC) result vector.
- */
+/* function VecMulMatr3 */
 __inline VEC VecMulMatr3( VEC V, MATR M )
 {
-  return VecSet(V.x * M.A[0][0] + V.y * M.A[1][0] + V.z * M.A[2][0],
-                V.x * M.A[0][1] + V.y * M.A[1][1] + V.z * M.A[2][1],
-                V.x * M.A[0][2] + V.y * M.A[1][2] + V.z * M.A[2][2]);
+  return VecSet(V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0],
+                V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1],
+                V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2]);
 } /* End of 'VecMulMatr3' function */
 
-/* Vector by matrix multiplication (with homogenious devide) function.
- * ARGUMENTS:
- *   - source vector:
- *       VEC V;
- *   - multiplied matrix:
- *       MATR M;
- * RETURNS:
- *   (VEC) result vector.
- */
+/* function PointTransform */
 __inline VEC PointTransform( VEC V, MATR M )
 {
-  FLT w = V.x * M.A[0][3] + V.y * M.A[1][3] + V.z * M.A[2][3] + M.A[3][3];
+  DBL w = V.x * M.a[0][3] + V.y * M.a[1][3] + V.z * M.a[2][3] + M.a[3][3];
 
-  return VecSet((V.x * M.A[0][0] + V.y * M.A[1][0] + V.z * M.A[2][0] + M.A[3][0]) / w,
-                (V.x * M.A[0][1] + V.y * M.A[1][1] + V.z * M.A[2][1] + M.A[3][1]) / w,
-                (V.x * M.A[0][2] + V.y * M.A[1][2] + V.z * M.A[2][2] + M.A[3][2]) / w);
+  return VecSet((V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0] + M.a[3][0]) / w,
+                (V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1] + M.a[3][1]) / w,
+                (V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2] + M.a[3][2]) / w);
 } /* End of 'PointTransform' function */
 
-#endif __VEC_H_
+#endif
+/* EOF 'VEC.H' */

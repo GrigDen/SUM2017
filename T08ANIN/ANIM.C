@@ -1,46 +1,49 @@
-/* FILE NAME: Vec.C
- * PROGRAMMER: GD5
- * DATE: 07.06.2017
- * PURPOSE: drawing sphere.
+/* FILE NAME: ANIM.C
+ * PROGRAMMER: A5
+ * DATE: 09.06.17
+ * PURPOSE: anim
  */
 
 #include "Anim.h"
 #include <mmsystem.h>
+
 #pragma comment(lib, "winmm")
 
+/* Joystic axis value determination */
+#define DG5_GET_JOYSTICK_AXIS(A) \
+  (2.0 * (ji.dw ## A ## pos - jc.w ## A ## min) / (jc.w ## A ## max - jc.w ## A ## min - 1) - 1)
 
-/* Timer local data */
-static UINT64
-  DG5_StartTime,  /* Start program time */
-  DG5_OldTime,    /* Time from program start to previous frame */
-  DG5_OldTimeFPS, /* Old time FPS measurement */
-  DG5_PauseTime,  /* Time during pause period */
-  DG5_TimePerSec, /* Timer resolution */
-  DG5_FrameCounter; /* Frames counter */
+dg5ANIM DG5_Anim;
+INT DG5_MouseWheel;
 
-DG5ANIM DG5_Anim;
+static UINT64 DG5_StartTime, 
+              DG5_OldTime,
+              DG5_OldTimeFPS,
+              DG5_PauseTime,
+              DG5_TimePerSec,
+              DG5_FrameCounter;
 
 VOID DG5_AnimInit( HWND hWnd )
 {
   HDC hDC;
   LARGE_INTEGER t;
 
-  /* Timer initialization */
-  QueryPerformanceFrequency(&t);
-  DG5_TimePerSec = t.QuadPart;
-  QueryPerformanceCounter(&t);
-  DG5_StartTime = DG5_OldTime = DG5_OldTimeFPS = t.QuadPart;
-  DG5_PauseTime = 0;
-  DG5_FrameCounter = 0;
-
-  DG5_Anim.IsPause = FALSE;
-  DG5_Anim.FPS = 50;
-
-  memset(&DG5_Anim, 0, sizeof(DG5ANIM));
+  memset(&DG5_Anim, 0, sizeof(dg5ANIM));
   DG5_Anim.hWnd = hWnd;
   hDC = GetDC(hWnd);
   DG5_Anim.hDC = CreateCompatibleDC(hDC);
   ReleaseDC(hWnd, hDC);
+
+  QueryPerformanceFrequency(&t);
+  DG5_TimePerSec = t.QuadPart;
+  QueryPerformanceCounter(&t);
+  DG5_StartTime = DG5_OldTime = DG5_OldTimeFPS = t.QuadPart;
+  DG5_FrameCounter = 0;
+  DG5_PauseTime = 0;
+
+  DG5_Anim.IsPause = FALSE;
+  DG5_Anim.FPS = 50;
+
 
 }
 
@@ -58,7 +61,7 @@ VOID DG5_AnimClose( VOID )
   DeleteDC(DG5_Anim.hDC);
   DeleteObject(DG5_Anim.hFrame);
 
-  memset(&DG5_Anim, 0, sizeof(DG5ANIM));
+  memset(&DG5_Anim, 0, sizeof(dg5ANIM));
 
 }
 
@@ -83,38 +86,11 @@ VOID DG5_AnimCopyFrame( HDC hDC )
   BitBlt(hDC, 0, 0, DG5_Anim.W, DG5_Anim.H, DG5_Anim.hDC, 0, 0, SRCCOPY);
 }
 
-/* !!!!!!!!!RENDERING!!!!!!!!!!! */
 VOID DG5_AnimRender( VOID )
 {
   INT i;
   LARGE_INTEGER t;
-
-
-  /*** Handle timer ***/
-  DG5_FrameCounter++;                   /* -- increment frame counter (for FPS)*/
-  QueryPerformanceCounter(&t);          /* -- obtain current timer value*/
-  /* Global time */
-  DG5_Anim.GlobalTime = (DBL)(t.QuadPart Ц DG5_StartTime) / DG5_TimePerSec;
-  DG5_Anim.GlobalDeltaTime = (DBL)(t.QuadPart Ц DG5_OldTime) / DG5_TimePerSec;
-  /* Time with pause */
-  if (DG5_Anim.IsPause)
-  {
-    DG5_PauseTime += t.QuadPart Ц DG5_OldTime;
-    DG5_Anim.DeltaTime = 0;
-  }
-  else
-  {
-    DG5_Anim.Time = (DBL)(t.QuadPart Ц DG5_PauseTime - DG5_StartTime) / DG5_TimePerSec;
-    DG5_Anim.DeltaTime = DG5_Anim.GlobalDeltaTime;
-  }
-  /* FPS */
-  if (t.QuadPart Ц DG5_OldTimeFPS > DG5_TimePerSec)
-  {
-    DG5_Anim.FPS = (DBL)DG5_FrameCounter * DG5_TimePerSec / (t.QuadPart Ц DG5_OldTimeFPS);
-    DG5_OldTimeFPS = t.QuadPart;
-    DG5_FrameCounter = 0;
-  }
-  DG5_OldTime = t.QuadPart;
+  POINT pt;
 
   for (i = 0; i < DG5_Anim.NumOfUnits; i++)
     DG5_Anim.Units[i]->Response(DG5_Anim.Units[i], &DG5_Anim);
@@ -131,17 +107,46 @@ VOID DG5_AnimRender( VOID )
     Rectangle(DG5_Anim.hDC, 0, 0, DG5_Anim.W + 1, DG5_Anim.H + 1);
 
     DG5_Anim.Units[i]->Render(DG5_Anim.Units[i], &DG5_Anim);
-
   }
+
+
+  /*** Handle timer ***/
+  DG5_FrameCounter++;                    /* increment frame counter (for FPS) */
+  QueryPerformanceCounter(&t);           /* obtain current timer value */
+  /* Global time */
+  DG5_Anim.GlobalTime = (DBL)(t.QuadPart - DG5_StartTime) / DG5_TimePerSec;
+  DG5_Anim.GlobalDeltaTime = (DBL)(t.QuadPart - DG5_OldTime) / DG5_TimePerSec;
+  /* Time with pause */
+  if (DG5_Anim.IsPause)
+  {
+    DG5_PauseTime += t.QuadPart - DG5_OldTime;
+    DG5_Anim.DeltaTime = 0;
+  }
+  else
+  {
+    DG5_Anim.Time = (DBL)(t.QuadPart - DG5_PauseTime - DG5_StartTime) / DG5_TimePerSec;
+    DG5_Anim.DeltaTime = DG5_Anim.GlobalDeltaTime;
+  }
+  /* FPS */
+  if (t.QuadPart - DG5_OldTimeFPS > DG5_TimePerSec)
+  {
+    DG5_Anim.FPS = (DBL)DG5_FrameCounter * DG5_TimePerSec / (t.QuadPart - DG5_OldTimeFPS);
+    DG5_OldTimeFPS = t.QuadPart;
+    DG5_FrameCounter = 0;
+  }
+  DG5_OldTime = t.QuadPart;
+
+  /*** Handle keyboard ***/
+
   GetKeyboardState(DG5_Anim.Keys);
   for (i = 0; i < 256; i++)
   {
     DG5_Anim.Keys[i] >>= 7;
-    DG5_Anim.KeysClick[i] = DG5_Anim.Keys[i] && !DG5_Anim.KeysOld[i];<- ќтслеживание однократного нажати€
+    DG5_Anim.KeysClick[i] = DG5_Anim.Keys[i] && !DG5_Anim.KeysOld[i];
   }
   memcpy(DG5_Anim.KeysOld, DG5_Anim.Keys, 256);
 
-  POINT pt;
+  /*** Handle mouse ***/
 
   GetCursorPos(&pt);
   ScreenToClient(DG5_Anim.hWnd, &pt);
@@ -150,11 +155,13 @@ VOID DG5_AnimRender( VOID )
   DG5_Anim.Mx = pt.x;
   DG5_Anim.My = pt.y;
 
+  /*** Handle wheel ***/
+
   DG5_Anim.Mdz = DG5_MouseWheel;
   DG5_Anim.Mz += DG5_MouseWheel;
   DG5_MouseWheel = 0;
 
-  /*** Joystick handle ***/
+  /*** Handle joystick ***/
   if (joyGetNumDevs() > 0)
   {
     JOYCAPS jc;
@@ -187,9 +194,11 @@ VOID DG5_AnimRender( VOID )
       }
     }
   }
-} /* End of RENDERING */
 
-VOID DG5_AnimAddUnit( DG5UNIT *Uni )
+
+}
+
+VOID DG5_AnimAddUnit( dg5UNIT *Uni )
 {
   if (DG5_Anim.NumOfUnits < DG5_MAX_UNITS)
   {
@@ -243,4 +252,4 @@ VOID DG5_AnimFlipFullScreen( VOID )
   }
   isFullScreen = !isFullScreen;
 }
-/* End of 'ANIM.C' */
+/* EOF 'ANIM.C' */
