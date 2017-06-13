@@ -17,13 +17,13 @@
   VOID (*Response) (dg5UNIT *Uni, dg5ANIM *Ani); \
   VOID (*Render) (dg5UNIT *Uni, dg5ANIM *Ani)
 
-typedef struct tagDG5ANIM dg5ANIM;
-typedef struct tagDG5UNIT dg5UNIT;
+typedef struct tagdg5ANIM dg5ANIM;
+typedef struct tagdg5UNIT dg5UNIT;   
 
 extern dg5ANIM DG5_Anim;
 extern INT DG5_MouseWheel;
 
-struct tagDG5ANIM
+struct tagdg5ANIM
 {
   HWND hWnd;                    
   HDC hDC;                      
@@ -48,7 +48,7 @@ struct tagDG5ANIM
     Jx, Jy, Jz, Jr;              /* Joystick axes */
 };
 
-struct tagDG5UNIT
+struct tagdg5UNIT
 {
   DG5_UNIT_BASE_FIELDS;
 };

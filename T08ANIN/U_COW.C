@@ -11,11 +11,11 @@
 #include "units.h"
 
 /* Animation unit representation type */
-typedef struct tagDG5UNIT_COW
+typedef struct tagdg5UNIT_COW
 {
-  DG5_BASE_UNIT_FIELDS;
-  DG5OBJ3D Cow; /* Cow model */
-} DG5UNIT_COW;
+  DG5_BASE_UNIT_FIELDS
+  dg5OBJ3D Cow; /* Cow model */
+} dg5UNIT_COW;
 
 /* Cow drawing unit initialization function.
  * ARGUMENTS:
@@ -25,7 +25,7 @@ typedef struct tagDG5UNIT_COW
  *       dg5ANIM *Ani;
  * RETURNS: None.
  */
-static VOID DG5_UnitInit( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+static VOID DG5_UnitInit( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
   DG5_RndObjLoad(&Uni->Cow, "cow.object");
 } /* End of 'DG5_UnitInit' function */
@@ -38,7 +38,7 @@ static VOID DG5_UnitInit( DG5UNIT_COW *Uni, dg5ANIM *Ani )
  *       dg5ANIM *Ani;
  * RETURNS: None.
  */
-static VOID DG5_UnitClose( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+static VOID DG5_UnitClose( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
   DG5_RndObjFree(&Uni->Cow);
 } /* End of 'DG5_UnitClose' function */
@@ -51,7 +51,7 @@ static VOID DG5_UnitClose( DG5UNIT_COW *Uni, dg5ANIM *Ani )
  *       dg5ANIM *Ani;
  * RETURNS: None.
  */
-static VOID DG5_UnitResponse( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+static VOID DG5_UnitResponse( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
 } /* End of 'DG5_UnitResponse' function */
 
@@ -63,7 +63,7 @@ static VOID DG5_UnitResponse( DG5UNIT_COW *Uni, dg5ANIM *Ani )
  *       dg5ANIM *Ani;
  * RETURNS: None.
  */
-static VOID DG5_UnitRender( DG5UNIT_COW *Uni, dg5ANIM *Ani )
+static VOID DG5_UnitRender( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
   DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
 } /* End of 'DG5_UnitRender' function */

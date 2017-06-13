@@ -117,8 +117,8 @@ VOID DG5_RndObjDraw( DG5OBJ3D *Obj, MATR M )
   {
     VEC p = VecMulMatr(Obj->V[i], M);
     DBL
-      xp = p.x * DG5_RndProjDist / -p.Z,
-      yp = p.y * DG5_RndProjDist / -p.Z;
+      xp = p.x * DG5_RndProjDist / -p.z,
+      yp = p.y * DG5_RndProjDist / -p.z;
 
     pts[i].x = DG5_Anim.W / 2 + xp * DG5_Anim.W / DG5_RndWp;
     pts[i].y = DG5_Anim.H / 2 - yp * DG5_Anim.H / DG5_RndHp;
