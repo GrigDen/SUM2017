@@ -19,13 +19,17 @@ void Swap( int *A, int *B )
 void PrintPerm( void )
 { 
   int i;
+  double z = 1;
   FILE *f;
 
   f = fopen("Perm.TXT","a");
   if (f == NULL)
     return;
   for (i = 0; i < n; i++)
+  {
     fprintf(f, "%i", p[i]);
+    z *= p[i]; 
+  }
   fprintf(f,"-%s\n", parity ? "odd" : "even");
   fclose(f);
 }
@@ -44,7 +48,7 @@ void Go( int Pos )
     Swap(&p[Pos], &p[i]);
     if (Pos != i)
       parity = !parity;
-    Go(Pos + 1);
+    Go(Pos + 1); 
     Swap(&p[Pos], &p[i]);
     if (Pos != i)
       parity = !parity;

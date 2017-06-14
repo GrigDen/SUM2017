@@ -1,7 +1,3 @@
-
-
-
-
 /* FILE NAME: U_COW.C
  * PROGRAMMER: DG5
  * DATE: 10.06.2017

@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "anim.h"
+#include "render.h"
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -106,30 +107,50 @@ VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M )
 {
   INT i;
   POINT *pts;
+  MATR WVP;
 
   if ((pts = malloc(sizeof(POINT) * Obj->NumOfV)) == NULL)
     return;
+/*M = MatrMulMatr(M, DG5_RndMatrView);*/
 
-  M = MatrMulMatr(M, DG5_RndMatrView);
+  WVP = MatrMulMatr(M, MatrMulMatr(DG5_RndMatrView, DG5_RndMatrProj));
 
   /* Project all points */
   for (i = 0; i < Obj->NumOfV; i++)
   {
-    VEC p = PointTransform(Obj->V[i], M);
-    DBL
-      xp = p.x * DG5_RndProjDist / -p.z,
-      yp = p.y * DG5_RndProjDist / -p.z;
+    VEC p = VecMulMatr43(Obj->V[i], WVP);
+    /*xp = p.x * DG5_RndProjDist / -p.z,
+      yp = p.y * DG5_RndProjDist / -p.z; 
+      pts[i].x = DG5_Anim.W / 2 + xp * DG5_Anim.W / DG5_RndWp;
+      pts[i].y = DG5_Anim.H / 2 - yp * DG5_Anim.H / DG5_RndHp;*/
 
-    pts[i].x = DG5_Anim.W / 2 + xp * DG5_Anim.W / DG5_RndWp;
-    pts[i].y = DG5_Anim.H / 2 - yp * DG5_Anim.H / DG5_RndHp;
+    pts[i].x = (p.x + 1) * DG5_Anim.W / 2;
+    pts[i].x = (-p.x + 1) * DG5_Anim.H / 2;
   }
 
   /* Draw all facets */
-    SelectObject(DG5_Anim.hDC, GetStockObject(DC_BRUSH));
+  SelectObject(DG5_Anim.hDC, GetStockObject(BLACK_BRUSH));
+  SelectObject(DG5_Anim.hDC, GetStockObject(WHITE_PEN));
+  SetDCBrushColor(DG5_Anim.hDC, BLACK_BRUSH); /*RGB(155, 255, 255)*/
+  SetDCPenColor(DG5_Anim.hDC, WHITE_PEN);     /*RGB(155, 0, 0)*/
+  for (i = 0; i < Obj->NumOfF; i++)
+  {
+    POINT p[3];
+
+    p[0] = pts[Obj->F[i][0]];
+    p[1] = pts[Obj->F[i][1]];
+    p[2] = pts[Obj->F[i][2]];
+    
+    Polygon(DG5_Anim.hDC, p, 3);
+  }
+
+
+   /* SelectObject(DG5_Anim.hDC, GetStockObject(DC_BRUSH));
     SelectObject(DG5_Anim.hDC, GetStockObject(DC_PEN));
     SetDCBrushColor(DG5_Anim.hDC, RGB(0, 255, 255));
-    SetDCPenColor(DG5_Anim.hDC, RGB(255, 0, 0));;
-  for (i = 0; i < Obj->NumOfF; i++)
+    SetDCPenColor(DG5_Anim.hDC, RGB(255, 0, 0));
+    */
+  /*for (i = 0; i < Obj->NumOfF; i++)
   {
     POINT *p = &pts[Obj->F[i][0]];
     MoveToEx(DG5_Anim.hDC, p->x, p->y, NULL);
@@ -142,7 +163,7 @@ VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M )
 
     p = &pts[Obj->F[i][0]];
     LineTo(DG5_Anim.hDC, p->x, p->y);
-  }
+  }                     */
   free(pts);
 } /* End of 'DG5_RndObjDraw' function */
 

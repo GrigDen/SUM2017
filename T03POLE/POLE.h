@@ -1,7 +1,17 @@
-/* FILE NAME: T03EYES.C
- * PROGRAMMER: DG5
+/* FILE NAME: POLE.H
+ * PROGRAMMER: GD5
  * DATE: 05.06.2017
- * PURPOSE: Pole drawing program.
+ * PURPOSE: prototype.
  */
 
-VOID DrawArrow( HDC hDC, INT xc, INT yc, INT R, INT r, INT x, INT y, INT w, INT h, HWND hWnd);
+#ifndef __POLE_H_
+#define __POLE_H_
+
+#include <windows.h>
+
+
+void DrawArrow( HDC hDC, INT x, INT y, INT posx, INT posy);
+
+#endif __POLE_H_
+
+/* END OF 'POLE.H' FILE */

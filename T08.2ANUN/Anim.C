@@ -45,6 +45,7 @@ VOID DG5_AnimInit( HWND hWnd )
   DG5_Anim.IsPause = FALSE;
   DG5_Anim.FPS = 50;
   DG5_AnimAddUnit(DG5_UnitCreateControl());
+  DG5_AnimAddUnit(DG5_UnitCreateCow());
   DG5_RndInit();
 
 }
@@ -97,10 +98,11 @@ VOID DG5_AnimRender( VOID )
 
   for (i = 0; i < DG5_Anim.NumOfUnits; i++)
     DG5_Anim.Units[i]->Response(DG5_Anim.Units[i], &DG5_Anim);
+  /* BRUSH for drowing background */
   SelectObject(DG5_Anim.hDC, GetStockObject(DC_PEN));
   SelectObject(DG5_Anim.hDC, GetStockObject(DC_BRUSH));
-  SetDCBrushColor(DG5_Anim.hDC, RGB(0, 255, 255));
-  SetDCPenColor(DG5_Anim.hDC, RGB(255, 0, 0));
+  SetDCBrushColor(DG5_Anim.hDC, BLACK_BRUSH);     /*RGB(0, 255, 255)*/
+  SetDCPenColor(DG5_Anim.hDC, WHITE_PEN);        /*RGB(255, 0, 0)*/
   Rectangle(DG5_Anim.hDC, 0, 0, DG5_Anim.W + 1, DG5_Anim.H + 1);
 
   Rectangle(DG5_Anim.hDC, 0, 0, DG5_Anim.W + 1, DG5_Anim.H + 1);
@@ -108,8 +110,8 @@ VOID DG5_AnimRender( VOID )
   {
     SelectObject(DG5_Anim.hDC, GetStockObject(DC_BRUSH));
     SelectObject(DG5_Anim.hDC, GetStockObject(DC_PEN));
-    SetDCBrushColor(DG5_Anim.hDC, RGB(0, 255, 255));
-    SetDCPenColor(DG5_Anim.hDC, RGB(255, 0, 0));;
+    SetDCBrushColor(DG5_Anim.hDC, RGB(0, 255, 255));    /*RGB(0, 255, 255)*/
+    SetDCPenColor(DG5_Anim.hDC, RGB(255, 0, 0));       /*RGB(255, 0, 0)*/
     
 
     DG5_Anim.Units[i]->Render(DG5_Anim.Units[i], &DG5_Anim);
@@ -142,7 +144,7 @@ VOID DG5_AnimRender( VOID )
   }
   DG5_OldTime = t.QuadPart;
 
-  /*** Handle keyboard ***/
+  /*** Handle keyboard ***/                      
 
   GetKeyboardState(DG5_Anim.Keys);
   for (i = 0; i < 256; i++)

@@ -5,6 +5,9 @@
  */
 
 #include "anim.h"
+#pragma comment(lib, "opengl32")
+#pragma comment(lib, "glu32")
+#pragma comment(lib, "glew32s")
 
 
 /* Project parameters */
@@ -26,6 +29,7 @@ VOID DG5_RndInit( VOID )
   DG5_RndProjDist = 1;
   DG5_RndProjSize = 1;
   DG5_RndProjFarClip = 1000;
+
 
   DG5_RndMatrView = MatrView(VecSet1(23), VecSet1(0), VecSet(0, 1, 0));
 } /* End of 'DG5_RndInit' function */

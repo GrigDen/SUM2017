@@ -7,6 +7,11 @@
 #ifndef __RENDER_H_
 #define __RENDER_H_
 
+#define GLEW_STATIC
+#include <glew.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
+
 #include "def.h"
 
 /* Project parameters */

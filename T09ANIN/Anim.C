@@ -18,6 +18,8 @@ VOID DG5_AnimInit( HWND hWnd )
 {
   HDC hDC;
   LARGE_INTEGER t;
+  PIXELFORMATDESCRIPTOR pfd = {0};
+  INT i;
 
   memset(&DG5_Anim, 0, sizeof(dg5ANIM));
 
@@ -34,11 +36,36 @@ VOID DG5_AnimInit( HWND hWnd )
   DG5_PauseTime = 0;
   DG5_FrameCounter = 0;
 
-  DG5_Anim.IsPause = FALSE;
-  DG5_Anim.FPS = 50;
-  DG5_AnimAddUnit(DG5_UnitCreateControl());
-  DG5_AnimAddUnit(DG5_UnitCreateCow());
+
+  memset(&DG5_Anim, 0, sizeof(dg5ANIM));
+
+  /* Store window and create memory device context */
+  DG5_Anim.hWnd = hWnd;
+  DG5_Anim.hDC = GetDC(hWnd);
+  /* OpenGL initialization: setup pixel format */
+  pfd.nSize = sizeof(pfd);
+  pfd.nVersion = 1;
+  pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL;
+  pfd.cColorBits = 32;
+  pfd.cDepthBits = 32;
+  i = ChoosePixelFormat(DG5_Anim.hDC, &pfd);
+  DescribePixelFormat(DG5_Anim.hDC, i, sizeof(pfd), &pfd);
+  SetPixelFormat(DG5_Anim.hDC, i, &pfd);
+
+  /* OpenGL initialization: setup rendering context */
+  DG5_Anim.hGLRC = wglCreateContext(DG5_Anim.hDC);
+  wglMakeCurrent(DG5_Anim.hDC, DG5_Anim.hGLRC);
+  if (glewInit() != GLEW_OK ||
+      !(GLEW_ARB_vertex_shader && GLEW_ARB_fragment_shader))
+  {
+    wglMakeCurrent(NULL, NULL);
+    wglDeleteContext(DG5_Anim.hGLRC);
+    ReleaseDC(DG5_Anim.hWnd, DG5_Anim.hDC);
+    return FALSE;
+  }
   DG5_RndInit();
+  return TRUE;
+ 
 } /* End of 'DG5_AnimInit' function */
 
 VOID DG5_AnimClose( VOID )
@@ -52,37 +79,38 @@ VOID DG5_AnimClose( VOID )
     free(DG5_Anim.Units[i]);
   }
   DG5_Anim.NumOfUnits = 0;
-
+  /* Delete OpenGL data */
+  wglMakeCurrent(NULL, NULL);
+  wglDeleteContext(DG5_Anim.hGLRC);
   /* Delete GDI data */
-  DeleteDC(DG5_Anim.hDC);
-  DeleteObject(DG5_Anim.hFrame);
+  ReleaseDC(DG5_Anim.hWnd, DG5_Anim.hDC);
 
   memset(&DG5_Anim, 0, sizeof(dg5ANIM));
 } /* End of 'DG5_AnimClose' function */
 
 VOID DG5_AnimResize( INT W, INT H )
 {
-  HDC hDC;
-
   /* Store new window frame size */
   DG5_Anim.W = W;
   DG5_Anim.H = H;
 
+  glViewport(0, 0, W, H); 
   /* Create double buffer image */
-  if (DG5_Anim.hFrame != NULL)
+  /*if (DG5_Anim.hFrame != NULL)
     DeleteObject(DG5_Anim.hFrame);
   hDC = GetDC(DG5_Anim.hWnd);
   DG5_Anim.hFrame = CreateCompatibleBitmap(hDC, W, H);
   ReleaseDC(DG5_Anim.hWnd, hDC);
 
   SelectObject(DG5_Anim.hDC, DG5_Anim.hFrame);
-  DG5_RndSetProj();
+  DG5_RndSetProj();  */
 } /* End of 'DG5_AnimResize' function */
 
 VOID DG5_AnimCopyFrame( HDC hDC )
 {
-  BitBlt(hDC, 0, 0, DG5_Anim.W, DG5_Anim.H, DG5_Anim.hDC, 0, 0, SRCCOPY);
+  SwapBuffers(DG5_Anim.hDC);
 } /* End of 'DG5_AnimCopyFrame' function */
+
 
 VOID DG5_AnimRender( VOID )
 {
@@ -96,11 +124,7 @@ VOID DG5_AnimRender( VOID )
 
   /*** Clear frame ***/
   /* Clear background */
-  SelectObject(DG5_Anim.hDC, GetStockObject(NULL_PEN));
-  SelectObject(DG5_Anim.hDC, GetStockObject(DC_BRUSH));
-  SetDCBrushColor(DG5_Anim.hDC, RGB(100, 155, 220));
-  Rectangle(DG5_Anim.hDC, 0, 0, DG5_Anim.W + 1, DG5_Anim.H + 1);
-
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /*** Render all units ***/
   for (i = 0; i < DG5_Anim.NumOfUnits; i++)
   {

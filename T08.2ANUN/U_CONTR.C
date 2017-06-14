@@ -62,8 +62,7 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
     DG5_AnimFlipFullScreen();
   else if (Ani->KeysClick['P'])
     DG5_Anim.IsPause = !DG5_Anim.IsPause;
-  else if (Ani->KeysClick['C'])
-    DG5_AnimAddUnit(DG5_UnitCreateCow());
+  
 } /* End of 'DG5_UnitResponse' function */
 
 /* Control unit render function.

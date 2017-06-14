@@ -66,7 +66,7 @@
 				AdditionalLibraryDirectories="X:\TGRKIT\LIB;$(DXSDK_DIR)\Lib\0x86;$(OPENAL_DIR)Lib;"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -179,13 +179,77 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\l;,;p,.C"
+				RelativePath=".\DEF.H"
 				>
 			</File>
 			<File
-				RelativePath=".\ooo.h"
+				RelativePath=".\MAIN.C"
 				>
 			</File>
+			<Filter
+				Name="Animation System"
+				>
+				<File
+					RelativePath=".\Anim.C"
+					>
+				</File>
+				<File
+					RelativePath=".\Anim.H"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS.C"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Math Support"
+				>
+				<File
+					RelativePath=".\VEC.C"
+					>
+				</File>
+				<File
+					RelativePath=".\VEC.H"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Unit Samples"
+				>
+				<File
+					RelativePath=".\U_BALL.C"
+					>
+				</File>
+				<File
+					RelativePath=".\U_CONTR.C"
+					>
+				</File>
+				<File
+					RelativePath=".\U_COW.C"
+					>
+				</File>
+				<File
+					RelativePath=".\UNITS.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Rendering systime"
+				>
+				<File
+					RelativePath=".\OBJ3D.C"
+					>
+				</File>
+				<File
+					RelativePath=".\RENDER.C"
+					>
+				</File>
+				<File
+					RelativePath=".\RENDER.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"

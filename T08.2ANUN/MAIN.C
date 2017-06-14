@@ -23,7 +23,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR* CmdLine,
   wc.style = CS_VREDRAW | CS_HREDRAW;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
-  wc.hbrBackground = GetStockObject(WHITE_BRUSH);
+  wc.hbrBackground = GetStockObject(BLACK_BRUSH);
   wc.hCursor = LoadCursor(NULL, IDC_CROSS);
   wc.hIcon = LoadIcon(NULL, IDI_ASTERISK);
   wc.lpszMenuName = NULL;
@@ -43,6 +43,7 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR* CmdLine,
 
   ShowWindow(hWnd, SW_NORMAL);
 
+  
   while (TRUE)
   {
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -65,7 +66,6 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   PAINTSTRUCT ps;
   MINMAXINFO *MinMax;
   static INT w, h;
-  static HDC hMemDC;
   static HBITMAP hBm = NULL;
   
   switch (Msg)

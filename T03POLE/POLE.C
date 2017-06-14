@@ -1,52 +1,56 @@
-/* FILE NAME: T03EYES.C
- * PROGRAMMER: DG5
+/* FILE NAME: POLE.C
+ * PROGRAMMER: GD5
  * DATE: 05.06.2017
- * PURPOSE: Pole drawing program.
+ * PURPOSE: drawing pole.
  */
-/* Drowing ARROW*/
-#include <windows.h>
+
+#include <stdlib.h>
 #include <math.h>
-#include "POLE.h"
+#include <windows.h>
 
-/* Drowing EYE*/
-VOID DrawArrow( HDC hDC, INT xc, INT yc, INT R, INT r, INT x, INT y, INT w, INT h, HWND hWnd)
+#pragma warning (disable: 4244)
+
+#define wx 50
+#define wy 0
+#define rx 5
+#define ry 0
+
+void DrawArrow( HDC hDC, INT x, INT y, INT posx, INT posy)
 {
-  INT dx = x - xc, dy = y - yc, xm, ym;
-  POINT pt, pts[4];  
-  
-  FLOAT l = sqrt(dx * dx + dy * dy), mysin = dy / l, mycos = dx / l;
-  
-  /*Geting Cursor position */
-  GetCursorPos(&pt);
-  ScreenToClient(hWnd, &pt);
+  POINT p[3];
+  INT dx = x - posx, dy = y - posy;
+  FLOAT len = sqrt(dx * dx + dy * dy), si = - dy / len, co = dx / len;
+  HBRUSH hBr, hOldBr;
 
-  
-  /*Giving adres for points of arrow*/
-  xm = x * mycos - y * mysin;
-  ym = x * mysin + y * mycos; 
-  pts[0].x = x * mycos - y * mysin;
-  pts[0].y = ym;                   ד98נ89ננ
-  pts[1].x = 5;
-  pts[1].y = ym + 15;
-  pts[2].x = (xm) ;
-  pts[2].y = (ym + 20);
-  pts[3].x = (xm - 5);
-  pts[3].y = (ym + 15);
- 
-  
- Polygon(hDC, pts, 4);
+  hBr = CreateSolidBrush(RGB(255, 0, 0));
+  hOldBr = SelectObject(hDC, hBr);
+
+  SelectObject(hDC, GetStockObject(hBr));
+  p[0].x = x - rx * si;
+  p[0].y = y - rx * co;
+  p[1].x = x - wx * co + rx * si;
+  p[1].y = y + wx * si + rx * co;
+  p[2].x = x + rx * si;
+  p[2].y = y + rx * co;
+  Polygon(hDC, p, 3);
+
+  SelectObject(hDC, hOldBr);
+  DeleteObject(hBr);
+
+  hBr = CreateSolidBrush(RGB(0, 0, 255));
+  hOldBr = SelectObject(hDC, hBr);
+
+  SelectObject(hDC, GetStockObject(hBr));
+  p[0].x = x + wx * co - rx * si;
+  p[0].y = y - wx * si - rx * co;
+  p[1].x = x - rx * si;
+  p[1].y = y - rx * co;
+  p[2].x = x + rx * si;
+  p[2].y = y + rx * co;
+  Polygon(hDC, p, 3);
+
+  SelectObject(hDC, hOldBr);
+  DeleteObject(hBr);
 }
-  /*INT dx = x - xc, dy = y - yc, xm, ym;
-  POINT pt;
-  FLOAT l = sqrt(dx * dx + dy * dy), mysin = dy / l, mycos = dx / l;
 
-  GetCursorPos(&pt);
-  ScreenToClient(hWnd, &pt);
-
-  xm = xc + (R - r) * mycos;
-  ym = yc + (R - r) * mysin;
-  SelectObject(hDC, GetStockObject(WHITE_BRUSH));
-  Ellipse(hDC, xc - 20, yc - 20, xc + 20, yc + 20);
-  SelectObject(hDC, GetStockObject(BLACK_BRUSH));
-  Ellipse(hDC, xm - 10, ym - 10, xm + 10, ym + 10);
-  SelectObject(hDC,GetStockObject(NULL_BRUSH));*/
+/* END OF 'POLE.C' FILE */

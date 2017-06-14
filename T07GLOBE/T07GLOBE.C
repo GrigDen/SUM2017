@@ -102,8 +102,8 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   PAINTSTRUCT ps;
   MINMAXINFO *MinMax;
   static INT w, h;
-  static HDC hMemDC, hMemDCLogo;
-  static HBITMAP hBm, hBmAND, hBmXOR;
+  static HDC hMemDC;
+  static HBITMAP hBm;
 
   switch (Msg)
   {
@@ -118,7 +118,7 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   case WM_CREATE:
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
-    hMemDCLogo = CreateCompatibleDC(hDC);
+   // hMemDCLogo = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
     hBm = NULL;
     SetTimer(hWnd, 47, 30, NULL);

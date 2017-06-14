@@ -4,18 +4,22 @@
  * PURPOSE: Eyes drawing program.
  */
 
-#include <windows.h>
+#include <stdlib.h>
 #include <math.h>
+#include <time.h>
+
+#include "pole.h"
 
 #pragma warning (disable: 4244)
 
-#define WND_CLASS_NAME "My second window"
+#define WND_CLASS_NAME "My window class"
+#define defx 100
+#define defy 100
 
-LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, 
-                               WPARAM wParam,LPARAM lParam );
-
-INT WINAPI WinMain( HINSTANCE hInstance,
-                    HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd)
+/* Forward references */
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, unsigned Message, WPARAM wParam, LPARAM lParam);
+/* Main program function */   
+INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd )
 {
   WNDCLASS wc;
   HWND hWnd;
@@ -28,53 +32,49 @@ INT WINAPI WinMain( HINSTANCE hInstance,
   wc.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc.hIcon = LoadIcon(NULL, IDI_ERROR);
   wc.lpszMenuName = NULL;
-  wc.hInstance = hInstance;
+  wc.hInstance = hInstancce;
   wc.lpfnWndProc = MyWindowFunc;
   wc.lpszClassName = WND_CLASS_NAME;
 
+  /* register class */
   if (!RegisterClass(&wc))
   {
-    MessageBoxA(NULL, "Error register window class", "Error", MB_OK);
+    MessageBox(NULL, "...", "...", MB_OK);
     return 0;
   }
 
-  hWnd =
-    CreateWindow(WND_CLASS_NAME,
-      "Title",
-      WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
-      CW_USEDEFAULT, CW_USEDEFAULT,
-      NULL, NULL, hInstance, NULL);
+  /* create window */
+  hWnd = CreateWindow(WND_CLASS_NAME, "Title", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstancce, NULL);
 
+  /* show and redraw window */
   ShowWindow(hWnd, SW_SHOWNORMAL);
   UpdateWindow(hWnd);
 
+  /* waiting message about 'WM_QUIT' */
   while (GetMessage(&msg, NULL, 0, 0))
-  { 
+  {
     TranslateMessage(&msg);
     DispatchMessage(&msg);
   }
   return msg.wParam;
-}/*End of "WinMain" function */
-
- 
-
+} /* End of 'WinMain' function */
 
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
-
-  INT x, y, i;
   POINT pt;
   PAINTSTRUCT ps;
-  static HDC hMemDC;   
+  INT x, y;
   static INT w, h;
-  static HBITMAP hBm;
+  static HDC hMemDC, hMemDCLogo;
+  static HBITMAP hBm, hBmAND, hBmXOR;
 
   switch (Msg)
   {
   case WM_CREATE:
     hDC = GetDC(hWnd);
     hMemDC = CreateCompatibleDC(hDC);
+    hMemDCLogo = CreateCompatibleDC(hDC);
     ReleaseDC(hWnd, hDC);
     hBm = NULL;
     SetTimer(hWnd, 47, 30, NULL);
@@ -90,37 +90,27 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
     SelectObject(hMemDC, hBm);
     SendMessage(hWnd, WM_TIMER, 47, 0);
     return 0;
-
   case WM_KEYDOWN:
-    if (wParam == VK_ESCAPE)
+    if (wParam == VK_ESCAPE) /* press esc = exit*/
       DestroyWindow(hWnd);
     return 0;
   case WM_PAINT:
     hDC = BeginPaint(hWnd, &ps);
     BitBlt(hDC, 0, 0, w, h, hMemDC, 0, 0, SRCCOPY);
     EndPaint(hWnd, &ps);
-    return 0; 
-
+    return 0;
   case WM_TIMER:
     GetCursorPos(&pt);
     ScreenToClient(hWnd, &pt);
 
-    /*Drowing BackGroung */
-    SelectObject(hMemDC, GetStockObject(WHITE_BRUSH));
+    /* draw background */
+    SelectObject(hMemDC, GetStockObject(BLACK_BRUSH));
     Rectangle(hMemDC, -1, -1, w + 1, h + 1);
     InvalidateRect(hWnd, NULL, FALSE);
     SelectObject(hMemDC, GetStockObject(NULL_BRUSH));
-
-    Rectangle(hMemDC, -1, -1, w + 1, h + 1);
-    srand(30);
-    /*Drowing Objects */
-    for (i = 0; i < 1; i++)
-    {
-      x = rand() % w;
-      y = rand() % h;
-      DrawArrow(hMemDC, x, y, 30, 20, pt.x, pt.y, w, h, hWnd); 
-    }
-    InvalidateRect(hWnd, NULL, FALSE);
+    for (x = 0; x < w; x += 10)
+      for (y = 0; y < h; y += )
+        DrawArrow(hMemDC, x, y, pt.x, pt.y);
 
     return 0;
   case WM_ERASEBKGND:
@@ -134,3 +124,5 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
 } /* End of 'MyWindowFunc' fuction */
+
+/* END OF 'T03POLE.C' FILE */

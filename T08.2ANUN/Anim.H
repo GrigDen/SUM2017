@@ -12,10 +12,6 @@
 
 #define DG5_MAX_UNITS 50
 
-
-
-
-
 typedef struct tagdg5ANIM dg5ANIM;
 typedef struct tagdg5UNIT dg5UNIT;
 

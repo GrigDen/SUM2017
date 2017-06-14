@@ -42,6 +42,8 @@ struct tagdg5ANIM
   DBL
     Jx, Jy, Jz, Jr;              /* Joystick axes */
 
+  HGLRC hGLRC;  /* Rendering context */
+
 };
 
 VOID DG5_AnimInit( HWND hWnd );

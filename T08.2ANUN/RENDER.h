@@ -11,13 +11,14 @@
 
 /* Project parameters */
 extern DBL
-  DG5_RndWp,       /* Project plane width */
-  DG5_RndHp,       /* Project plane height */
+                       /* Project plane width */
+  DG5_RndProjFarClip,       /* Project plane height */
   DG5_RndProjDist, /* Distance from viewer to project plane */
   DG5_RndProjSize; /* Prohect plane inner size */
 
 extern MATR
-  DG5_RndMatrView; /* Viewer matrix */
+  DG5_RndMatrView, /* Viewer matrix */
+  DG5_RndMatrProj; /* Projection Matrix */
 
 /* Rendering system initialization function.
  * ARGUMENTS: None.
