@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include "anim.h"
+#include "render.h"
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -55,10 +56,10 @@ BOOL DG5_RndObjLoad( dg5OBJ3D *Obj, CHAR *FileName )
   {
     if (Buf[0] == 'v' && Buf[1] == ' ')
     {
-      DBL x, y, z;
+      DBL X, Y, Z;
 
-      sscanf(Buf + 2, "%lf%lf%lf", &x, &y, &z);
-      Obj->V[vn++] = VecSet(x, y, z);
+      sscanf(Buf + 2, "%lf%lf%lf", &X, &Y, &Z);
+      Obj->V[vn++] = VecSet(X, Y, Z);
     }
     else if (Buf[0] == 'f' && Buf[1] == ' ')
     {
@@ -104,43 +105,23 @@ VOID DG5_RndObjFree( dg5OBJ3D *Obj )
  */
 VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M )
 {
-  INT i;
-  POINT *pts;
+  INT i, j;
   MATR WVP;
 
-  if ((pts = malloc(sizeof(POINT) * Obj->NumOfV)) == NULL)
-    return;
-
   WVP = MatrMulMatr(M, MatrMulMatr(DG5_RndMatrView, DG5_RndMatrProj));
-
-  /* Project all points */
-  for (i = 0; i < Obj->NumOfV; i++)
-  {
-    VEC P = PointTransform(Obj->V[i], WVP);
-    
-    pts[i].x = (P.X + 1) * DG5_Anim.W / 2;
-    pts[i].y = (-P.Y + 1) * DG5_Anim.H / 2;
-  }
+  glLoadMatrixd(WVP.a[0]);
 
   /* Draw all facets */
-    //SelectObject(DG5_Anim.hDC, GetStockObject(NULL_BRUSH));
-    //SelectObject(DG5_Anim.hDC, GetStockObject(DC_PEN));
-    //SetDCPenColor(DG5_Anim.hDC, RGB(0, 200, 0));
-   SelectObject(DG5_Anim.hDC, GetStockObject(BLACK_BRUSH));
-  SelectObject(DG5_Anim.hDC, GetStockObject(WHITE_PEN));
-  SetDCBrushColor(DG5_Anim.hDC, RGB(155, 255, 255)); /*RGB(155, 255, 255)*/
-  SetDCPenColor(DG5_Anim.hDC, RGB(155, 0, 0));     /*RGB(155, 0, 0)*/
-
+  glBegin(GL_TRIANGLES);
   for (i = 0; i < Obj->NumOfF; i++)
-  {    
-    POINT p[3];
+    for (j = 0; j < 3; j++)
+    {
+      VEC p;
 
-    p[0] = pts[Obj->F[i][0]];
-    p[1] = pts[Obj->F[i][1]];
-    p[2] = pts[Obj->F[i][2]];
-    Polygon(DG5_Anim.hDC, p, 3);
-  }
-  free(pts);
+      p = Obj->V[Obj->F[i][j]];
+      glVertex3dv(&p.X);
+    }
+  glEnd();
 } /* End of 'DG5_RndObjDraw' function */
 
 /* END OF 'OBJ3D.C' FILE */

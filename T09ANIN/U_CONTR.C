@@ -8,13 +8,12 @@
 #include <math.h>
 #include <time.h>
 
-#include "anim.h"
+#include "units.h"
 
 /* Animation unit representation type */
 typedef struct tagdg5UNIT_CONTROL
 {
   DG5_UNIT_BASE_FIELDS
-  HFONT hFont;         /* Using font */
 } dg5UNIT_CONTROL;
 
 /* Control unit initialization function.
@@ -27,9 +26,6 @@ typedef struct tagdg5UNIT_CONTROL
  */
 static VOID DG5_UnitInit( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
 {
-  Uni->hFont = CreateFont(30, 0, 0, 0, FW_BOLD, TRUE, FALSE, FALSE, RUSSIAN_CHARSET,
-    OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-    DEFAULT_PITCH | FF_DONTCARE, "");
 } /* End of 'DG5_UnitInit' function */
 
 /* Control unit deinitialization function.
@@ -42,7 +38,6 @@ static VOID DG5_UnitInit( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitClose( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
 {
-  DeleteObject(Uni->hFont);
 } /* End of 'DG5_UnitClose' function */
 
 /* Control unit inter frame events handle function.
@@ -61,6 +56,7 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
     DG5_AnimFlipFullScreen();
   else if (Ani->KeysClick['P'])
     DG5_Anim.IsPause = !DG5_Anim.IsPause;
+ 
 } /* End of 'DG5_UnitResponse' function */
 
 /* Control unit render function.
@@ -73,22 +69,14 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitRender( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
 {
-  HFONT hFontOld = SelectObject(Ani->hDC, Uni->hFont);
-  INT len;
   static CHAR Buf[100];
 
-  len = sprintf(Buf, "FPS: %.5f, Units: %d, Wheel: %d"
+  sprintf(Buf, "FPS: %.5f, Units: %d, Wheel: %d"
     "J: %.3f %.3f %.3f %.3f",
     Ani->FPS, Ani->NumOfUnits, Ani->Mz,
     Ani->Jx, Ani->Jy, Ani->Jz, Ani->Jr);
 
-  SetBkMode(Ani->hDC, TRANSPARENT);
-  SetTextColor(Ani->hDC, RGB(0, 0, 0));
-  TextOut(Ani->hDC, 2, 2, Buf, len);
-  SetTextColor(Ani->hDC, RGB(0, 150, 0));
-  TextOut(Ani->hDC, 0, 0, Buf, len);
-
-  SelectObject(Ani->hDC, hFontOld);
+  SetWindowText(Ani->hWnd, Buf);
 } /* End of 'DG5_UnitRender' function */
 
 /* Control unit creation function.

@@ -1,4 +1,10 @@
-#include "anim.h"
+/* FILE NAME: UNIT.C
+ * PROGRAMMER: DG5
+ * DATE: 09.06.17
+ * PURPOSE: Units
+ */
+
+#include "Anim.h"
 
 /* Unit initialization function.
  * ARGUMENTS:
@@ -47,6 +53,7 @@ static VOID DG5_UnitRender( dg5UNIT *Uni, dg5ANIM *Ani )
 {
 } /* End of 'DG5_UnitRender' function */
 
+
 /* Unit creation function.
  * ARGUMENTS:
  *   - unit structure size in bytes:
@@ -69,3 +76,5 @@ dg5UNIT * DG5_AnimUnitCreate( INT Size )
   Uni->Render = DG5_UnitRender;
   return Uni;
 } /* End of 'DG5_AnimUnitCreate' function */
+
+/* EOF 'UNITS.C' */

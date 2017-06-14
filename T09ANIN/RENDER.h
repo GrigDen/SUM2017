@@ -7,6 +7,7 @@
 #ifndef __RENDER_H_
 #define __RENDER_H_
 
+/* OpenGL specific includes */
 #define GLEW_STATIC
 #include <glew.h>
 #include <gl/gl.h>
@@ -16,14 +17,15 @@
 
 /* Project parameters */
 extern DBL
-  DG5_RndWp,       /* Project plane width */
-  DG5_RndHp,       /* Project plane height */
+                       /* Project plane width */
+  DG5_RndProjFarClip,       /* Project plane height */
   DG5_RndProjDist, /* Distance from viewer to project plane */
   DG5_RndProjSize; /* Prohect plane inner size */
 
 extern MATR
   DG5_RndMatrView, /* Viewer matrix */
-  DG5_RndMatrProj;
+  DG5_RndMatrProj; /* Projection Matrix */
+
 /* Rendering system initialization function.
  * ARGUMENTS: None.
  * RETURNS: None.

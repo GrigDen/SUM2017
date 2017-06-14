@@ -1,6 +1,11 @@
-#include <string.h>
+/* FILE NAME: ANIM.C
+ * PROGRAMMER: DG5
+ * DATE: 09.06.17
+ * PURPOSE: anim
+ */
 
-#include "anim.h"
+#include "Anim.h"
+#include "Units.h"
 #include <mmsystem.h>
 
 #pragma comment(lib, "winmm")
@@ -12,36 +17,33 @@
 dg5ANIM DG5_Anim;
 INT DG5_MouseWheel;
 
-static UINT64 DG5_StartTime, DG5_OldTime, DG5_OldTimeFPS, DG5_PauseTime, DG5_TimePerSec, DG5_FrameCounter;
+static UINT64 DG5_StartTime, 
+              DG5_OldTime,
+              DG5_OldTimeFPS,
+              DG5_PauseTime,
+              DG5_TimePerSec,
+              DG5_FrameCounter;
 
 VOID DG5_AnimInit( HWND hWnd )
 {
-  HDC hDC;
+  INT i;
   LARGE_INTEGER t;
   PIXELFORMATDESCRIPTOR pfd = {0};
-  INT i;
 
   memset(&DG5_Anim, 0, sizeof(dg5ANIM));
-
-  /* Store window and create memory device context */
   DG5_Anim.hWnd = hWnd;
-  hDC = GetDC(hWnd);
-  DG5_Anim.hDC = CreateCompatibleDC(hDC);
-  ReleaseDC(hWnd, hDC);
+  DG5_Anim.hDC = GetDC(hWnd);
 
   QueryPerformanceFrequency(&t);
   DG5_TimePerSec = t.QuadPart;
   QueryPerformanceCounter(&t);
   DG5_StartTime = DG5_OldTime = DG5_OldTimeFPS = t.QuadPart;
-  DG5_PauseTime = 0;
   DG5_FrameCounter = 0;
+  DG5_PauseTime = 0;
 
+  DG5_Anim.IsPause = FALSE;
+  DG5_Anim.FPS = 50;
 
-  memset(&DG5_Anim, 0, sizeof(dg5ANIM));
-
-  /* Store window and create memory device context */
-  DG5_Anim.hWnd = hWnd;
-  DG5_Anim.hDC = GetDC(hWnd);
   /* OpenGL initialization: setup pixel format */
   pfd.nSize = sizeof(pfd);
   pfd.nVersion = 1;
@@ -61,24 +63,23 @@ VOID DG5_AnimInit( HWND hWnd )
     wglMakeCurrent(NULL, NULL);
     wglDeleteContext(DG5_Anim.hGLRC);
     ReleaseDC(DG5_Anim.hWnd, DG5_Anim.hDC);
-    return FALSE;
+    exit(0);
   }
+
   DG5_RndInit();
-  return TRUE;
- 
-} /* End of 'DG5_AnimInit' function */
+}
 
 VOID DG5_AnimClose( VOID )
 {
   INT i;
 
-  /* Destroy all units */
   for (i = 0; i < DG5_Anim.NumOfUnits; i++)
   {
     DG5_Anim.Units[i]->Close(DG5_Anim.Units[i], &DG5_Anim);
     free(DG5_Anim.Units[i]);
   }
   DG5_Anim.NumOfUnits = 0;
+
   /* Delete OpenGL data */
   wglMakeCurrent(NULL, NULL);
   wglDeleteContext(DG5_Anim.hGLRC);
@@ -86,31 +87,23 @@ VOID DG5_AnimClose( VOID )
   ReleaseDC(DG5_Anim.hWnd, DG5_Anim.hDC);
 
   memset(&DG5_Anim, 0, sizeof(dg5ANIM));
-} /* End of 'DG5_AnimClose' function */
+
+}
 
 VOID DG5_AnimResize( INT W, INT H )
 {
-  /* Store new window frame size */
   DG5_Anim.W = W;
   DG5_Anim.H = H;
 
-  glViewport(0, 0, W, H); 
-  /* Create double buffer image */
-  /*if (DG5_Anim.hFrame != NULL)
-    DeleteObject(DG5_Anim.hFrame);
-  hDC = GetDC(DG5_Anim.hWnd);
-  DG5_Anim.hFrame = CreateCompatibleBitmap(hDC, W, H);
-  ReleaseDC(DG5_Anim.hWnd, hDC);
+  glViewport(0, 0, W, H);
 
-  SelectObject(DG5_Anim.hDC, DG5_Anim.hFrame);
-  DG5_RndSetProj();  */
-} /* End of 'DG5_AnimResize' function */
+  DG5_RndSetProj();
+}
 
-VOID DG5_AnimCopyFrame( HDC hDC )
+VOID DG5_AnimCopyFrame( VOID )
 {
   SwapBuffers(DG5_Anim.hDC);
-} /* End of 'DG5_AnimCopyFrame' function */
-
+}
 
 VOID DG5_AnimRender( VOID )
 {
@@ -118,27 +111,9 @@ VOID DG5_AnimRender( VOID )
   LARGE_INTEGER t;
   POINT pt;
 
-  /*** Send response to all units ***/
-  for (i = 0; i < DG5_Anim.NumOfUnits; i++)
-    DG5_Anim.Units[i]->Response(DG5_Anim.Units[i], &DG5_Anim);
-
-  /*** Clear frame ***/
-  /* Clear background */
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  /*** Render all units ***/
-  for (i = 0; i < DG5_Anim.NumOfUnits; i++)
-  {
-    SelectObject(DG5_Anim.hDC, GetStockObject(DC_PEN));
-    SelectObject(DG5_Anim.hDC, GetStockObject(NULL_BRUSH));
-    SetDCPenColor(DG5_Anim.hDC, RGB(0, 255, 0));
-    SetDCBrushColor(DG5_Anim.hDC, RGB(255, 255, 255));
-
-    DG5_Anim.Units[i]->Render(DG5_Anim.Units[i], &DG5_Anim);
-  }
-
   /*** Handle timer ***/
-  DG5_FrameCounter++;
-  QueryPerformanceCounter(&t);
+  DG5_FrameCounter++;                    /* increment frame counter (for FPS) */
+  QueryPerformanceCounter(&t);           /* obtain current timer value */
   /* Global time */
   DG5_Anim.GlobalTime = (DBL)(t.QuadPart - DG5_StartTime) / DG5_TimePerSec;
   DG5_Anim.GlobalDeltaTime = (DBL)(t.QuadPart - DG5_OldTime) / DG5_TimePerSec;
@@ -162,6 +137,8 @@ VOID DG5_AnimRender( VOID )
   }
   DG5_OldTime = t.QuadPart;
 
+  /*** Handle keyboard ***/                      
+
   GetKeyboardState(DG5_Anim.Keys);
   for (i = 0; i < 256; i++)
   {
@@ -170,17 +147,22 @@ VOID DG5_AnimRender( VOID )
   }
   memcpy(DG5_Anim.KeysOld, DG5_Anim.Keys, 256);
 
+  /*** Handle mouse ***/
+
   GetCursorPos(&pt);
   ScreenToClient(DG5_Anim.hWnd, &pt);
   DG5_Anim.Mdx = pt.x - DG5_Anim.Mx;
   DG5_Anim.Mdy = pt.y - DG5_Anim.My;
   DG5_Anim.Mx = pt.x;
   DG5_Anim.My = pt.y;
+
+  /*** Handle wheel ***/
+
   DG5_Anim.Mdz = DG5_MouseWheel;
   DG5_Anim.Mz += DG5_MouseWheel;
   DG5_MouseWheel = 0;
 
-  /*** Joystick handle ***/
+  /*** Handle joystick ***/
   if (joyGetNumDevs() > 0)
   {
     JOYCAPS jc;
@@ -213,7 +195,20 @@ VOID DG5_AnimRender( VOID )
       }
     }
   }
-} /* End of 'DG5_AnimRender' function */
+
+  for (i = 0; i < DG5_Anim.NumOfUnits; i++)
+    DG5_Anim.Units[i]->Response(DG5_Anim.Units[i], &DG5_Anim);
+
+  /*** Clear frame ***/
+  /* Clear background */
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  for (i = 0; i < DG5_Anim.NumOfUnits; i++)
+  {
+    DG5_Anim.Units[i]->Render(DG5_Anim.Units[i], &DG5_Anim);
+  }
+  glFinish();
+}
 
 VOID DG5_AnimAddUnit( dg5UNIT *Uni )
 {
@@ -227,48 +222,46 @@ VOID DG5_AnimAddUnit( dg5UNIT *Uni )
 
 VOID DG5_AnimDoExit( VOID )
 {
-  static BOOL IsExit = FALSE;
+  static BOOL isExit = FALSE;
 
-  if(IsExit)
+  if (isExit)
     return;
-  IsExit = TRUE;
+  isExit = TRUE;
   PostMessage(DG5_Anim.hWnd, WM_CLOSE, 0, 0);
-} /* End of 'DG5_AnimAddUnit' function */
+}
 
 VOID DG5_AnimFlipFullScreen( VOID )
 {
-  static BOOL IsFullScreen = FALSE;
+  static BOOL isFullScreen;
   static RECT SaveRect;
-
-  if (IsFullScreen)
+  if (isFullScreen)
   {
-    /* restore window size */
-    SetWindowPos(DG5_Anim.hWnd, HWND_NOTOPMOST, SaveRect.left, SaveRect.top, SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top, SWP_NOOWNERZORDER);
+    SetWindowPos(DG5_Anim.hWnd, HWND_NOTOPMOST, 
+      SaveRect.left, SaveRect.top, 
+      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top, 
+      SWP_NOOWNERZORDER);
   }
   else
   {
-    /* Set full screen size to window */
-    HMONITOR hmon;
+    HMONITOR hMon;
     MONITORINFOEX moninfo;
     RECT rc;
 
-    /* Store window old size */
     GetWindowRect(DG5_Anim.hWnd, &SaveRect);
 
-    /* Get nearest monitor */
-    hmon = MonitorFromWindow(DG5_Anim.hWnd, MONITOR_DEFAULTTONEAREST);
+    hMon = MonitorFromWindow(DG5_Anim.hWnd, MONITOR_DEFAULTTONEAREST);
 
-    /* Obtain monitor info */
     moninfo.cbSize = sizeof(moninfo);
-    GetMonitorInfo(hmon, (MONITORINFO *)&moninfo);
+    GetMonitorInfo(hMon, (MONITORINFO *)&moninfo);
 
-    /* Set window new size */
     rc = moninfo.rcMonitor;
     AdjustWindowRect(&rc, GetWindowLong(DG5_Anim.hWnd, GWL_STYLE), FALSE);
 
-    SetWindowPos(DG5_Anim.hWnd, HWND_TOPMOST, rc.left, rc.top, rc.right - rc. left, rc.bottom - rc.top, SWP_NOOWNERZORDER);
+    SetWindowPos(DG5_Anim.hWnd, HWND_NOTOPMOST, 
+      rc.left, rc.top, 
+      rc.right - rc.left, rc.bottom - rc.top, 
+      SWP_NOOWNERZORDER);
   }
-  IsFullScreen = !IsFullScreen;
-} /* End of 'DG5_AnimFlipFullScreen' function */
-
-/* END OF 'ANIM.C' FILE */
+  isFullScreen = !isFullScreen;
+}
+/* EOF 'ANIM.C' */

@@ -8,7 +8,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "anim.h"
+#include "units.h"
 
 /* Animation unit representation type */
 typedef struct tagdg5UNIT_COW
@@ -65,7 +65,7 @@ static VOID DG5_UnitResponse( dg5UNIT_COW *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitRender( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndObjDraw(&Uni->Cow, MatrMulMatr(MatrRotateY(Ani->Time * 100), MatrTranslate(VecSet1((DBL)Ani->Mz / 100))));
+  DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
 } /* End of 'DG5_UnitRender' function */
 
 /* Cow drawing unit creation function.

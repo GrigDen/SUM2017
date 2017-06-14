@@ -1,7 +1,7 @@
 /* FILE NAME: DEF.H
  * PROGRAMMER: DG5
  * DATE: 09.06.2017
- * PURPOSE: Common definitions. 
+ * PURPOSE: Common definitions.
  */
 
 #ifndef __DEF_H_
@@ -14,7 +14,7 @@
 #  define _CRTDBG_MAP_ALLOC
 #  include <crtdbg.h>
 #  define SetDbgMemHooks() \
-     _CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | \
+     _CrtSetDbgFlag(_CRTDBG_LEDG5_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF | \
        _CRTDBG_ALLOC_MEM_DF | _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG))
 #else /* _DEBUG */
 #  define SetDbgMemHooks() ((VOID)0)
@@ -26,6 +26,8 @@
 /* 64-bit integer data types */
 typedef __int64 INT64;
 typedef unsigned __int64 UINT64;
+
+
 
 
 #endif /* __DEF_H_ */

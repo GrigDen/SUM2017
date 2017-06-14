@@ -1,62 +1,20 @@
 /* FILE NAME: MAIN.C
  * PROGRAMMER: DG5
- * DATE: 09.06.2017
- * PURPOSE: main.
+ * DATE: 09.06.17
+ * PURPOSE: Main
  */
 
-#include "vec.h"
-#include "anim.h"
-
-#pragma warning (disable: 4244)
+#include "Anim.h" 
+#include "Units.h"
 
 #define WND_CLASS_NAME "My window class"
 
-/* Forward references */
-LRESULT CALLBACK MyWindowFunc( HWND hWnd, unsigned Message, WPARAM wParam, LPARAM lParam);
-/* Set/reset full screen mode function */
-static VOID FlipFullScreen( HWND hWnd )
-{
-  static BOOL IsFullScreen = FALSE;
-  static RECT SaveRect;
 
-  if (IsFullScreen)
-  {
-    /* restore window size */
-    SetWindowPos(hWnd, HWND_TOP,
-      SaveRect.left, SaveRect.top,
-      SaveRect.right - SaveRect.left, SaveRect.bottom - SaveRect.top,
-      SWP_NOOWNERZORDER);
-  }
-  else
-  {
-    /* Set full screen size to window */
-    HMONITOR hmon;
-    MONITORINFOEX moninfo;
-    RECT rc;
+/*defenition*/
+LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam );
 
-    /* Store window old size */
-    GetWindowRect(hWnd, &SaveRect);
-
-    /* Get nearest monitor */
-    hmon = MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
-
-    /* Obtain monitor info */
-    moninfo.cbSize = sizeof(moninfo);
-    GetMonitorInfo(hmon, (MONITORINFO *)&moninfo);
-
-    /* Set window new size */
-    rc = moninfo.rcMonitor;
-    AdjustWindowRect(&rc, GetWindowLong(hWnd, GWL_STYLE), FALSE);
-
-    SetWindowPos(hWnd, HWND_TOPMOST,
-      rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
-      SWP_NOOWNERZORDER);
-  }
-  IsFullScreen = !IsFullScreen;
-} /* End of 'FlipFullScreen' function */
-
-/* Main program function */   
-INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine, INT ShowCmd )
+/* Main prog func */
+INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR* CmdLine, INT ShowCmd )
 {
   WNDCLASS wc;
   HWND hWnd;
@@ -65,53 +23,56 @@ INT WINAPI WinMain( HINSTANCE hInstancce, HINSTANCE hPrevInstance, CHAR *CmdLine
   wc.style = CS_VREDRAW | CS_HREDRAW;
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
-  wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-  wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-  wc.hIcon = LoadIcon(NULL, IDI_ERROR);
+  wc.hbrBackground = GetStockObject(BLACK_BRUSH);
+  wc.hCursor = LoadCursor(NULL, IDC_CROSS);
+  wc.hIcon = LoadIcon(NULL, IDI_ASTERISK);
   wc.lpszMenuName = NULL;
-  wc.hInstance = hInstancce;
+  wc.hInstance = hInstance;
   wc.lpfnWndProc = MyWindowFunc;
   wc.lpszClassName = WND_CLASS_NAME;
 
-  /* register class */
   if (!RegisterClass(&wc))
   {
-    MessageBox(NULL, "Error", "Error", MB_OK);
+    MessageBox(NULL, "ERR register", "ERROR", MB_OK);
     return 0;
   }
 
-  /* create window */
-  hWnd = CreateWindow(WND_CLASS_NAME, "Title", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstancce, NULL);
+  hWnd = CreateWindow(WND_CLASS_NAME, "Anim", WS_OVERLAPPEDWINDOW, 
+      CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, 
+      hInstance, NULL);
 
-  /* show and redraw window */
-  ShowWindow(hWnd, SW_SHOWNORMAL);
-  UpdateWindow(hWnd);
+  ShowWindow(hWnd, SW_NORMAL);
 
-  /* waiting message about 'WM_QUIT' */
+  DG5_AnimAddUnit(DG5_UnitCreateControl());
+  DG5_AnimAddUnit(DG5_UnitCreateCow());
+  
   while (TRUE)
   {
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
       if (msg.message == WM_QUIT)
-        break;
+        return 0;
       TranslateMessage(&msg);
       DispatchMessage(&msg);
     }
     else
-      SendMessage(hWnd, WM_TIMER, 47, 0);
+    {
+      DG5_AnimRender();
+      SendMessage(hWnd, WM_TIMER, 30, 0);
+    }
   }
   return msg.wParam;
-} /* End of 'WinMain' function */
+} /* End of WinMain */
 
+/* MyWindowFunc */
 LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam )
 {
   HDC hDC;
   PAINTSTRUCT ps;
   MINMAXINFO *MinMax;
   static INT w, h;
-  static HDC hMemDC, hMemDCLogo;
-  static HBITMAP hBm, hBmAND, hBmXOR;
-
+  static HBITMAP hBm = NULL;
+  
   switch (Msg)
   {
   case WM_GETMINMAXINFO:
@@ -122,47 +83,42 @@ LRESULT CALLBACK MyWindowFunc( HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam
       GetSystemMetrics(SM_CYMENU) +
       GetSystemMetrics(SM_CYBORDER) * 2;
     return 0;
-
-  case WM_CREATE:
-    SetTimer(hWnd, 47, 1, NULL);
-
-    DG5_AnimInit(hWnd);
-    return 0;
-
   case WM_SIZE:
+    w = LOWORD(lParam);
+    h = HIWORD(lParam);
+
     DG5_AnimResize(LOWORD(lParam), HIWORD(lParam));
     DG5_AnimRender();
     return 0;
-
-  case WM_KEYDOWN:
-    if (wParam == VK_ESCAPE) /* press esc = exit*/
-      DestroyWindow(hWnd);
+  case WM_CREATE:
+    DG5_AnimInit(hWnd);
+    SetTimer(hWnd, 30, 1, NULL);
     return 0;
-
+  case WM_TIMER:
+    InvalidateRect(hWnd, NULL, FALSE);
+    return 0;
+  case WM_PAINT:
+    hDC = BeginPaint(hWnd, &ps);
+    DG5_AnimCopyFrame();
+    EndPaint(hWnd, &ps);
+    return 0;
+  case WM_KEYDOWN:
+    if (wParam == VK_ESCAPE)
+      DestroyWindow(hWnd);
+    if (wParam == 'F')
+      DG5_AnimFlipFullScreen();
+    return 0;
   case WM_MOUSEWHEEL:
     DG5_MouseWheel += (SHORT)HIWORD(wParam);
     return 0;
-
-  case WM_PAINT:
-    hDC = BeginPaint(hWnd, &ps);
-    DG5_AnimCopyFrame(hDC);
-    EndPaint(hWnd, &ps);
-    return 0;
-
-  case WM_TIMER:
-    DG5_AnimRender();
-    InvalidateRect(hWnd, NULL, FALSE);
-    return 0;
-
-  case WM_ERASEBKGND:
-    return 1;
-
   case WM_DESTROY:
     DG5_AnimClose();
-    PostQuitMessage(0);
+    PostQuitMessage(30);
+    KillTimer(hWnd, 30);
     return 0;
   }
   return DefWindowProc(hWnd, Msg, wParam, lParam);
-} /* End of 'MyWindowFunc' fuction */
+} /* End of MyWindowFunc */
 
-/* END OF 'MAIN.C' FILE */
+
+/* EOF 'MAIN.C' */

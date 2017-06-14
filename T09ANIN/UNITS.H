@@ -1,12 +1,20 @@
+/* FILE NAME: UNITS.H
+ * PROGRAMMER: DG5
+ * DATE: 09.06.17
+ * PURPOSE: units
+ */
+
 #ifndef UNITS_H
 #define UNITS_H
 
-#include "def.h"
+#include "Def.h"
 
-#define DG5_UNIT_BASE_FIELDS \
-  VOID (*Init) (dg5UNIT *Uni, dg5ANIM *Ani); \
-  VOID (*Close) (dg5UNIT *Uni, dg5ANIM *Ani); \
-  VOID (*Response) (dg5UNIT *Uni, dg5ANIM *Ani); \
-  VOID (*Render) (dg5UNIT *Uni, dg5ANIM *Ani);
+#include "Anim.h"
 
-#endif 
+
+dg5UNIT * DG5_UnitCreateCow( VOID );
+dg5UNIT * DG5_UnitCreateControl( VOID );
+dg5UNIT * DG5_AnimUnitCreate( INT Size );
+#endif
+
+/* EOF 'UNITS.H' */
