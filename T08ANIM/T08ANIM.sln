@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T08.2ANUN", "T08.2ANUN.vcproj", "{561C1BF5-8198-4EA2-B35E-F7FEB6B285D1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "T08ANIM", "T08ANIM.vcproj", "{561C1BF5-8198-4EA2-B35E-F7FEB6B285D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,7 +1,7 @@
-/* FILE NAME: Vec.H
- * PROGRAMMER: GD5
- * DATE: 07.06.2017
- * PURPOSE: drawing sphere.
+/* FILE NAME: VEC.H
+ * PROGRAMMER: DG5
+ * DATE: 09.06.17
+ * PURPOSE: Library
  */
 
 #ifndef VEC_H
@@ -36,8 +36,7 @@ __inline VEC VecSet( DBL x, DBL y, DBL z )
 
 __inline VEC VecSet1( DBL x )
 {
-  VEC v = {x, x, x};
-  return v;
+  return VecSet(x, x, x);
 }
 
 __inline VEC VecAddVec( VEC v1, VEC v2 )
@@ -245,13 +244,17 @@ __inline MATR MatrRotateY( DBL AngleInDegree )
   return m;
 }
 
-__inline VEC VecMulMatr( VEC v, MATR m )
+/*__inline VEC VecMulMatr( VEC v, MATR m )
 {
+  FLT w =v.x * m.a[0][3] + v.y * m.a[1][3] + v.z * m.a[2][3] + m.a [3][3];
 
+  return VecSet(v.x * m.a[0][0] + v.y * m.a[1][0] + v.z * m.a[2][0] + m.a[3][0],
+                v.x * m.a[0][1] + v.y * m.a[1][1] + v.z * m.a[2][1] + m.a[3][1],
+                v.x * m.a[0][2] + v.y * m.a[1][2] + v.z * m.a[2][2] + m.a[3][2]);
 }
 
 
-
+  */
 __inline VEC VecCrossVec( VEC v1, VEC v2 )
 {
   return VecSet(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
@@ -302,6 +305,20 @@ __inline VEC PointTransform( VEC V, MATR M )
                 (V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1] + M.a[3][1]) / w,
                 (V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2] + M.a[3][2]) / w);
 } /* End of 'PointTransform' function */
+
+__inline MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n ,DBL f )
+{
+  MATR m = MatrIdentity();
+  m.a[0][0] = 2 * n / (r - l);
+  m.a[1][1] = 2 * n / (t - b);
+  m.a[2][0] = (r + l) / (r - l);
+  m.a[2][1] = (t + b) / (t - b);
+  m.a[2][2] = -(f + n) / (f - n);
+  m.a[2][3] = -1;
+  m.a[3][2] = -2 * n * f / (f - n);
+  m.a[3][3] = 0;
+  return m;
+} /* End of 'MatrFrustum' function */
 
 #endif
 /* EOF 'VEC.H' */

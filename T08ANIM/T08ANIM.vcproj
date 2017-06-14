@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="T08.2ANUN"
+	Name="T08ANIM"
 	ProjectGUID="{561C1BF5-8198-4EA2-B35E-F7FEB6B285D1}"
-	RootNamespace="T082ANUN"
+	RootNamespace="T08ANIM"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
