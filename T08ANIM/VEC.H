@@ -24,49 +24,49 @@ typedef struct tagMATR
 
 typedef struct tagVEC
 {
-  DBL x, y, z;
+  DBL X, Y, Z;
 } VEC;
 
 
-__inline VEC VecSet( DBL x, DBL y, DBL z )
+__inline VEC VecSet( DBL X, DBL Y, DBL Z )
 {
-  VEC v = {x, y, z};
+  VEC v = {X, Y, Z};
   return v;
 }
 
-__inline VEC VecSet1( DBL x )
+__inline VEC VecSet1( DBL X )
 {
-  return VecSet(x, x, x);
+  return VecSet(X, X, X);
 }
 
 __inline VEC VecAddVec( VEC v1, VEC v2 )
 {
-  return VecSet(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
+  return VecSet(v1.X + v2.X, v1.Y + v2.Y, v1.Z + v2.Z);
 }
 
 __inline VEC VecSubVec( VEC v1, VEC v2 )
 {
-  return VecSet(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
+  return VecSet(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
 }
 
 __inline VEC VecMulNum( VEC v, DBL n )
 {
-  return VecSet(v.x * n, v.y * n, v.z * n);
+  return VecSet(v.X * n, v.Y * n, v.Z * n);
 }
 
 __inline VEC VecDivNum( VEC v, DBL n )
 {
-  return VecSet(v.x / n, v.y / n, v.z / n);
+  return VecSet(v.X / n, v.Y / n, v.Z / n);
 }
 
 __inline VEC VecNeg( VEC v )
 {
-  return VecSet(-v.x, -v.y, -v.z );
+  return VecSet(-v.X, -v.Y, -v.Z );
 }
 
 __inline DBL VecDotVec( VEC v1, VEC v2 )
 {
-  return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+  return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
 }
 
 static MATR UnitMatrix = 
@@ -86,7 +86,7 @@ __inline MATR MatrIdentity( VOID )
 
 __inline DBL VecLen2( VEC v )
 {
-  return v.x * v.x + v.y * v.y + v.z * v.z;
+  return v.X * v.X + v.Y * v.Y + v.Z * v.Z;
 }
 
 __inline DBL VecLen( VEC v )
@@ -98,7 +98,7 @@ __inline VEC VecNormalize( VEC v )
 {
   DBL l = VecLen(v);
 
-  return VecSet(v.x / l, v.y / l, v.z / l);
+  return VecSet(v.X / l, v.Y / l, v.Z / l);
 }
 
 __inline MATR MatrMulMatr( MATR m1, MATR m2 )
@@ -173,17 +173,17 @@ __inline MATR MatrRotate(DBL AngleDeg, VEC v )
   MATR m;
   VEC p = VecNormalize(v);
   
-  m.a[0][0] = co + p.x * p.x * (1 - co);
-  m.a[0][1] = p.y * p.x * (1 - co) + p.z * si;
-  m.a[0][2] = p.z * p.x * (1 - co) - p.y * si;
+  m.a[0][0] = co + p.X * p.X * (1 - co);
+  m.a[0][1] = p.Y * p.X * (1 - co) + p.Z * si;
+  m.a[0][2] = p.Z * p.X * (1 - co) - p.Y * si;
 
-  m.a[1][0] = p.x * p.y * (1 - co) - p.z * si;
-  m.a[1][1] = co + p.y * p.y * (1 - co);
-  m.a[1][2] = p.z * p.y * (1 - co) + p.x * si;
+  m.a[1][0] = p.X * p.Y * (1 - co) - p.Z * si;
+  m.a[1][1] = co + p.Y * p.Y * (1 - co);
+  m.a[1][2] = p.Z * p.Y * (1 - co) + p.X * si;
 
-  m.a[2][0] = p.x * p.z * (1 - co) + p.y * si;
-  m.a[2][1] = p.y * p.z * (1 - co) - p.x * si;
-  m.a[2][2] = co + p.z * p.z * (1 -co);
+  m.a[2][0] = p.X * p.Z * (1 - co) + p.Y * si;
+  m.a[2][1] = p.Y * p.Z * (1 - co) - p.X * si;
+  m.a[2][2] = co + p.Z * p.Z * (1 -co);
   
   return m;
 } /* End of MatrRotate */
@@ -192,9 +192,9 @@ __inline MATR MatrTranslate( VEC t )
 {
   MATR m = UnitMatrix;
 
-  m.a[3][0] = t.x;
-  m.a[3][1] = t.y;
-  m.a[3][2] = t.z;
+  m.a[3][0] = t.X;
+  m.a[3][1] = t.Y;
+  m.a[3][2] = t.Z;
   return m;
 }
 
@@ -202,9 +202,9 @@ __inline MATR MatrScale( VEC s )
 {
   MATR m = UnitMatrix;
 
-  m.a[0][0] = s.x;
-  m.a[1][1] = s.y;
-  m.a[2][2] = s.z;
+  m.a[0][0] = s.X;
+  m.a[1][1] = s.Y;
+  m.a[2][2] = s.Z;
   return m;
 }
 
@@ -244,20 +244,18 @@ __inline MATR MatrRotateY( DBL AngleInDegree )
   return m;
 }
 
-/*__inline VEC VecMulMatr( VEC v, MATR m )
+__inline VEC VecMulMatr( VEC v, MATR m )
 {
-  FLT w =v.x * m.a[0][3] + v.y * m.a[1][3] + v.z * m.a[2][3] + m.a [3][3];
+  DBL w =v.X * m.a[0][3] + v.Y * m.a[1][3] + v.Z * m.a[2][3] + m.a [3][3];
 
-  return VecSet(v.x * m.a[0][0] + v.y * m.a[1][0] + v.z * m.a[2][0] + m.a[3][0],
-                v.x * m.a[0][1] + v.y * m.a[1][1] + v.z * m.a[2][1] + m.a[3][1],
-                v.x * m.a[0][2] + v.y * m.a[1][2] + v.z * m.a[2][2] + m.a[3][2]);
+  return VecSet((v.X * m.a[0][0] + v.Y * m.a[1][0] + v.Z * m.a[2][0] + m.a[3][0]) / w,
+                (v.X * m.a[0][1] + v.Y * m.a[1][1] + v.Z * m.a[2][1] + m.a[3][1]) / w,
+                (v.X * m.a[0][2] + v.Y * m.a[1][2] + v.Z * m.a[2][2] + m.a[3][2]) / w);
 }
 
-
-  */
 __inline VEC VecCrossVec( VEC v1, VEC v2 )
 {
-  return VecSet(v1.y * v2.z - v1.z * v2.y, v1.z * v2.x - v1.x * v2.z, v1.x * v2.y - v1.y * v2.x);
+  return VecSet(v1.Y * v2.Z - v1.Z * v2.Y, v1.Z * v2.X - v1.X * v2.Z, v1.X * v2.Y - v1.Y * v2.X);
 }
 
 /* function MatrView */
@@ -270,9 +268,9 @@ __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
   MATR m =
   {
     {
-      {               Right.x,                Up.x,              -Dir.x, 0},
-      {               Right.y,                Up.y,              -Dir.y, 0},
-      {               Right.z,                Up.z,              -Dir.z, 0},
+      {               Right.X,                Up.X,              -Dir.X, 0},
+      {               Right.Y,                Up.Y,              -Dir.Y, 0},
+      {               Right.Z,                Up.Z,              -Dir.Z, 0},
       {-VecDotVec(Loc, Right), -VecDotVec(Loc, Up), VecDotVec(Loc, Dir), 1}
     }
   };
@@ -283,27 +281,27 @@ __inline MATR MatrView( VEC Loc, VEC At, VEC Up1 )
 /* function VecMulMatr43 */
 __inline VEC VecMulMatr43( VEC V, MATR M )
 {
-  return VecSet(V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0] + M.a[3][0],
-                V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1] + M.a[3][1],
-                V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2] + M.a[3][2]);
+  return VecSet(V.X * M.a[0][0] + V.Y * M.a[1][0] + V.Z * M.a[2][0] + M.a[3][0],
+                V.X * M.a[0][1] + V.Y * M.a[1][1] + V.Z * M.a[2][1] + M.a[3][1],
+                V.X * M.a[0][2] + V.Y * M.a[1][2] + V.Z * M.a[2][2] + M.a[3][2]);
 } /* End of 'VecMulMatr43' function */
 
 /* function VecMulMatr3 */
 __inline VEC VecMulMatr3( VEC V, MATR M )
 {
-  return VecSet(V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0],
-                V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1],
-                V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2]);
+  return VecSet(V.X * M.a[0][0] + V.Y * M.a[1][0] + V.Z * M.a[2][0],
+                V.X * M.a[0][1] + V.Y * M.a[1][1] + V.Z * M.a[2][1],
+                V.X * M.a[0][2] + V.Y * M.a[1][2] + V.Z * M.a[2][2]);
 } /* End of 'VecMulMatr3' function */
 
 /* function PointTransform */
 __inline VEC PointTransform( VEC V, MATR M )
 {
-  DBL w = V.x * M.a[0][3] + V.y * M.a[1][3] + V.z * M.a[2][3] + M.a[3][3];
+  DBL w = V.X * M.a[0][3] + V.Y * M.a[1][3] + V.Z * M.a[2][3] + M.a[3][3];
 
-  return VecSet((V.x * M.a[0][0] + V.y * M.a[1][0] + V.z * M.a[2][0] + M.a[3][0]) / w,
-                (V.x * M.a[0][1] + V.y * M.a[1][1] + V.z * M.a[2][1] + M.a[3][1]) / w,
-                (V.x * M.a[0][2] + V.y * M.a[1][2] + V.z * M.a[2][2] + M.a[3][2]) / w);
+  return VecSet((V.X * M.a[0][0] + V.Y * M.a[1][0] + V.Z * M.a[2][0] + M.a[3][0]) / w,
+                (V.X * M.a[0][1] + V.Y * M.a[1][1] + V.Z * M.a[2][1] + M.a[3][1]) / w,
+                (V.X * M.a[0][2] + V.Y * M.a[1][2] + V.Z * M.a[2][2] + M.a[3][2]) / w);
 } /* End of 'PointTransform' function */
 
 __inline MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n ,DBL f )

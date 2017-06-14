@@ -56,10 +56,10 @@ BOOL DG5_RndObjLoad( dg5OBJ3D *Obj, CHAR *FileName )
   {
     if (Buf[0] == 'v' && Buf[1] == ' ')
     {
-      DBL x, y, z;
+      DBL X, Y, Z;
 
-      sscanf(Buf + 2, "%lf%lf%lf", &x, &y, &z);
-      Obj->V[vn++] = VecSet(x, y, z);
+      sscanf(Buf + 2, "%lf%lf%lf", &X, &Y, &Z);
+      Obj->V[vn++] = VecSet(X, Y, Z);
     }
     else if (Buf[0] == 'f' && Buf[1] == ' ')
     {
@@ -111,28 +111,26 @@ VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M )
 
   if ((pts = malloc(sizeof(POINT) * Obj->NumOfV)) == NULL)
     return;
-/*M = MatrMulMatr(M, DG5_RndMatrView);*/
+  /* M = MatrMulMatr(M, DG5_RndMatrView); */
 
   WVP = MatrMulMatr(M, MatrMulMatr(DG5_RndMatrView, DG5_RndMatrProj));
 
   /* Project all points */
   for (i = 0; i < Obj->NumOfV; i++)
   {
-    VEC p = VecMulMatr43(Obj->V[i], WVP);
-    /*xp = p.x * DG5_RndProjDist / -p.z,
-      yp = p.y * DG5_RndProjDist / -p.z; 
-      pts[i].x = DG5_Anim.W / 2 + xp * DG5_Anim.W / DG5_RndWp;
-      pts[i].y = DG5_Anim.H / 2 - yp * DG5_Anim.H / DG5_RndHp;*/
+    VEC p = VecMulMatr(Obj->V[i], WVP);
+    /*xp = p.X * DG5_RndProjDist / -p.Z,
+      yp = p.Y * DG5_RndProjDist / -p.Z; 
+      pts[i].X = DG5_Anim.W / 2 + xp * DG5_Anim.W / DG5_RndWp;
+      pts[i].Y = DG5_Anim.H / 2 - yp * DG5_Anim.H / DG5_RndHp;*/
 
-    pts[i].x = (p.x + 1) * DG5_Anim.W / 2;
-    pts[i].x = (-p.x + 1) * DG5_Anim.H / 2;
+    pts[i].x = (p.X + 1) * DG5_Anim.W / 2;
+    pts[i].y = (-p.Y + 1) * DG5_Anim.H / 2;
   }
 
   /* Draw all facets */
-  SelectObject(DG5_Anim.hDC, GetStockObject(BLACK_BRUSH));
+  SelectObject(DG5_Anim.hDC, GetStockObject(NULL_BRUSH));
   SelectObject(DG5_Anim.hDC, GetStockObject(WHITE_PEN));
-  SetDCBrushColor(DG5_Anim.hDC, BLACK_BRUSH); /*RGB(155, 255, 255)*/
-  SetDCPenColor(DG5_Anim.hDC, WHITE_PEN);     /*RGB(155, 0, 0)*/
   for (i = 0; i < Obj->NumOfF; i++)
   {
     POINT p[3];
@@ -153,16 +151,16 @@ VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M )
   /*for (i = 0; i < Obj->NumOfF; i++)
   {
     POINT *p = &pts[Obj->F[i][0]];
-    MoveToEx(DG5_Anim.hDC, p->x, p->y, NULL);
+    MoveToEx(DG5_Anim.hDC, p->X, p->Y, NULL);
 
     p = &pts[Obj->F[i][1]];
-    LineTo(DG5_Anim.hDC, p->x, p->y);
+    LineTo(DG5_Anim.hDC, p->X, p->Y);
 
     p = &pts[Obj->F[i][2]];
-    LineTo(DG5_Anim.hDC, p->x, p->y);
+    LineTo(DG5_Anim.hDC, p->X, p->Y);
 
     p = &pts[Obj->F[i][0]];
-    LineTo(DG5_Anim.hDC, p->x, p->y);
+    LineTo(DG5_Anim.hDC, p->X, p->Y);
   }                     */
   free(pts);
 } /* End of 'DG5_RndObjDraw' function */

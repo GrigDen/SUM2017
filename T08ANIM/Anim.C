@@ -44,8 +44,6 @@ VOID DG5_AnimInit( HWND hWnd )
 
   DG5_Anim.IsPause = FALSE;
   DG5_Anim.FPS = 50;
-  DG5_AnimAddUnit(DG5_UnitCreateControl());
-  DG5_AnimAddUnit(DG5_UnitCreateCow());
   DG5_RndInit();
 
 }

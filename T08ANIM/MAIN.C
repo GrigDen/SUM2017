@@ -43,6 +43,8 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, CHAR* CmdLine,
 
   ShowWindow(hWnd, SW_NORMAL);
 
+  DG5_AnimAddUnit(DG5_UnitCreateControl());
+  DG5_AnimAddUnit(DG5_UnitCreateCow());
   
   while (TRUE)
   {
