@@ -17,16 +17,31 @@
 #define Degree2Radian(a) D2R(a)
 
 typedef double DBL;
+typedef float FLT;
 typedef struct tagMATR
 {
-  DBL a[4][4];
+  FLT a[4][4];
 } MATR;
 
 typedef struct tagVEC
 {
-  DBL X, Y, Z;
+  FLT X, Y, Z;
 } VEC;
 
+typedef struct tagVEC2
+{
+  FLT X, Y;
+} VEC2;
+
+typedef struct tagVEC4
+{
+  FLT X, Y, Z, W;
+} VEC4;
+
+__inline FLT Rnd1()
+{
+  return sin(rand());    
+}
 
 __inline VEC VecSet( DBL X, DBL Y, DBL Z )
 {

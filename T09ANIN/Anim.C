@@ -29,6 +29,7 @@ VOID DG5_AnimInit( HWND hWnd )
   INT i;
   LARGE_INTEGER t;
   PIXELFORMATDESCRIPTOR pfd = {0};
+  /**DG5_RndProgId = DG5_RndShaderLoad("A");**/
 
   memset(&DG5_Anim, 0, sizeof(dg5ANIM));
   DG5_Anim.hWnd = hWnd;
@@ -65,8 +66,9 @@ VOID DG5_AnimInit( HWND hWnd )
     ReleaseDC(DG5_Anim.hWnd, DG5_Anim.hDC);
     exit(0);
   }
-
+  /*Render system initialization */
   DG5_RndInit();
+  DG5_RndProgId = DG5_RndShaderLoad("A");
 }
 
 VOID DG5_AnimClose( VOID )
@@ -195,9 +197,16 @@ VOID DG5_AnimRender( VOID )
       }
     }
   }
-
+  /* Sends respons to all units */
   for (i = 0; i < DG5_Anim.NumOfUnits; i++)
     DG5_Anim.Units[i]->Response(DG5_Anim.Units[i], &DG5_Anim);
+  /*** Update shader ***/
+  if (DG5_Anim.GlobalTime - ShdTime > 2)
+  {
+    DG5_RndShaderFree(DG5_RndProgId);
+    DG5_RndProgId = DG5_RndShaderLoad("A");
+    ShdTime = DG5_Anim.GlobalTime;
+  }
 
   /*** Clear frame ***/
   /* Clear background */

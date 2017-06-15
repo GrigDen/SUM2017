@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="T09ANIN"
-	ProjectGUID="{6C2CC24F-E233-44CC-8143-D6A6CC33626E}"
-	RootNamespace="T09ANIN"
+	Name="T09ANIM"
+	ProjectGUID="{561C1BF5-8198-4EA2-B35E-F7FEB6B285D1}"
+	RootNamespace="T09ANIM"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>
@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="X:\TGRKIT\INCLUDE;$(DXSDK_DIR)\Include;$(OPENAL_DIR)Include;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CRT_SECURE_NO_WARNINGS;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -120,7 +120,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="X:\TGRKIT\INCLUDE;$(DXSDK_DIR)\Include;$(OPENAL_DIR)Include;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CRT_SECURE_NO_WARNINGS;_CONSOLE"
 				RuntimeLibrary="1"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -142,7 +142,7 @@
 				AdditionalLibraryDirectories="X:\TGRKIT\LIB;$(DXSDK_DIR)\Lib\0x86;$(OPENAL_DIR)Lib;"
 				GenerateManifest="false"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -190,11 +190,11 @@
 				Name="Animation System"
 				>
 				<File
-					RelativePath=".\Anim.C"
+					RelativePath=".\ANIM.C"
 					>
 				</File>
 				<File
-					RelativePath=".\Anim.H"
+					RelativePath=".\ANIM.H"
 					>
 				</File>
 				<File
@@ -215,24 +215,12 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Rendering systime"
-				>
-				<File
-					RelativePath=".\OBJ3D.C"
-					>
-				</File>
-				<File
-					RelativePath=".\RENDER.C"
-					>
-				</File>
-				<File
-					RelativePath=".\RENDER.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="Unit Samples"
 				>
+				<File
+					RelativePath=".\U_BALL.C"
+					>
+				</File>
 				<File
 					RelativePath=".\U_CONTR.C"
 					>
@@ -243,6 +231,30 @@
 				</File>
 				<File
 					RelativePath=".\UNITS.H"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Rendering systime"
+				>
+				<File
+					RelativePath=".\OBJ.C"
+					>
+				</File>
+				<File
+					RelativePath=".\PRIM.C"
+					>
+				</File>
+				<File
+					RelativePath=".\RENDER.C"
+					>
+				</File>
+				<File
+					RelativePath=".\RENDER.H"
+					>
+				</File>
+				<File
+					RelativePath=".\SHEDERS.C"
 					>
 				</File>
 			</Filter>

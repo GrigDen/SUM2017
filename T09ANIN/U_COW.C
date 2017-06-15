@@ -28,7 +28,9 @@ typedef struct tagdg5UNIT_COW
  */
 static VOID DG5_UnitInit( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndObjLoad(&Uni->Cow, "cow.object");
+  DG5_RndPrimLoad(&Uni->Cow, "a
+    .object");
+  /*DG5_RndObjLoad(&Uni->Cow, "cow.object");*/
 } /* End of 'DG5_UnitInit' function */
 
 /* Cow drawing unit deinitialization function.
@@ -41,7 +43,7 @@ static VOID DG5_UnitInit( dg5UNIT_COW *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitClose( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndObjFree(&Uni->Cow);
+  DG5_RndPrimFree(&Uni->Cow);
 } /* End of 'DG5_UnitClose' function */
 
 /* Cow drawing unit inter frame events handle function.

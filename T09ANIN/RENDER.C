@@ -11,7 +11,7 @@
 #pragma comment(lib, "glew32s")
 
 /* Project parameters */
-DBL
+FLT
   DG5_RndProjSize,       /* Prohect plane inner size */
   DG5_RndProjDist,     /* Distance from viewer to project plane */
   DG5_RndProjFarClip; /* distance to project far clip plane */
@@ -19,6 +19,9 @@ DBL
 MATR
   DG5_RndMatrView, /* Viewer matrix */
   DG5_RndMatrProj; /* Projection Matrix */
+
+UINT 
+  DG5_RndProgId; /* Shader program indentifier */
 
 /* Rendering system initialization function.
  * ARGUMENTS: None.

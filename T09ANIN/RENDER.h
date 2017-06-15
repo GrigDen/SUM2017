@@ -15,6 +15,7 @@
 
 #include "def.h"
 
+
 /* Project parameters */
 extern DBL
                        /* Project plane width */
@@ -25,6 +26,8 @@ extern DBL
 extern MATR
   DG5_RndMatrView, /* Viewer matrix */
   DG5_RndMatrProj; /* Projection Matrix */
+extern UINT 
+  DG5_RndProgId; /* Shader program indentifier */
 
 /* Rendering system initialization function.
  * ARGUMENTS: None.
@@ -43,13 +46,45 @@ VOID DG5_RndSetProj( VOID );
  ***/
 
 /* Object description type */
-typedef struct tagdg5OBJ3D
+typedef struct tagdg5VERTEX
 {
-  VEC *V;      /* Vertex array */
-  INT NumOfV;  /* Vertex array size */
-  INT (*F)[3]; /* Facets array (point indices) */
-  INT NumOfF;  /* Facets array size */
-} dg5OBJ3D;
+  VEC P;
+  VEC2 T;
+  VEC N;
+  VEC4 C;
+     
+}dg5VERTEX;
+
+typedef struct tagdg5PRIM
+{
+  BOOL IsTrimesh;
+  INT NumOfV;
+  INT NumOfI;
+  MATR M;
+  INT VA, VBuf;
+  INT IBuf;
+
+}dg5PRIM;
+
+typedef struct tagdg5OBJ
+{
+  INT NumOfP;  
+  dg5PRIM *P;
+
+} dg5OBJ;
+                                                                                                   
+
+                                                                                                   
+/* Save text to log file function.
+ * ARGUMENTS:
+ *   - text 1 to save:
+ *       CHAR *Stage;
+ *   - text 2 to save:
+ *       CHAR *Text;
+ * RETURNS: None.
+ */
+static VOID DG5_RndShaderLog( CHAR *Stage, CHAR *Text );
+
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -60,7 +95,7 @@ typedef struct tagdg5OBJ3D
  * RETURNS:
  *   (BOOL) TRUE if success, FALSE otherwise.
  */
-BOOL DG5_RndObjLoad( dg5OBJ3D *Obj, CHAR *FileName );
+BOOL DG5_RndObjLoad( dg5OBJ *Obj, CHAR *FileName );
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -68,7 +103,7 @@ BOOL DG5_RndObjLoad( dg5OBJ3D *Obj, CHAR *FileName );
  *       dg5OBJ3D *Obj;
  * RETURNS: None.
  */
-VOID DG5_RndObjFree( dg5OBJ3D *Obj );
+VOID DG5_RndObjFree( dg5OBJ *Obj );
 
 /* Object drawing function.
  * ARGUMENTS:
@@ -78,7 +113,7 @@ VOID DG5_RndObjFree( dg5OBJ3D *Obj );
  *       MATR M;
  * RETURNS: None.
  */
-VOID DG5_RndObjDraw( dg5OBJ3D *Obj, MATR M );
+VOID DG5_RndObjDraw( dg5OBJ *Obj, MATR M );
 
 #endif /* __RENDER_H_ */
 
