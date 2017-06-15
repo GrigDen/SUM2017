@@ -14,6 +14,7 @@
 typedef struct tagdg5UNIT_COW
 {
   DG5_UNIT_BASE_FIELDS
+  DBL RotateY;
   dg5OBJ3D Cow; /* Cow model */
 } dg5UNIT_COW;
 
@@ -53,6 +54,9 @@ static VOID DG5_UnitClose( dg5UNIT_COW *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitResponse( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
+  Uni->RotateY += Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdx * 200;
+  if(!Ani->IsPause)
+    Uni->RotateY += Ani->DeltaTime * 102;
 } /* End of 'DG5_UnitResponse' function */
 
 /* Cow drawing unit render function.
@@ -65,7 +69,8 @@ static VOID DG5_UnitResponse( dg5UNIT_COW *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitRender( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
+  DG5_RndObjDraw(&Uni->Cow, MatrMulMatr(MatrRotateY(Uni->RotateY), MatrTranslate(VecSet1((DBL)Ani->Mz / 102))));
+  //DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
 } /* End of 'DG5_UnitRender' function */
 
 /* Cow drawing unit creation function.
