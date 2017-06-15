@@ -56,7 +56,10 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
     DG5_AnimFlipFullScreen();
   else if (Ani->KeysClick['P'])
     DG5_Anim.IsPause = !DG5_Anim.IsPause;
- 
+  else if (Ani->KeysClick['Q'])
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  else if (Ani->KeysClick['W'])
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 } /* End of 'DG5_UnitResponse' function */
 
 /* Control unit render function.
