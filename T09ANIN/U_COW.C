@@ -15,7 +15,7 @@ typedef struct tagdg5UNIT_COW
 {
   DG5_UNIT_BASE_FIELDS
   DBL RotateY;
-  dg5OBJ3D Cow; /* Cow model */
+  dg5PRIM Cow; /* Cow model */
 } dg5UNIT_COW;
 
 /* Cow drawing unit initialization function.
@@ -28,8 +28,7 @@ typedef struct tagdg5UNIT_COW
  */
 static VOID DG5_UnitInit( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndPrimLoad(&Uni->Cow, "a
-    .object");
+  DG5_RndPrimLoad(&Uni->Cow, "s.object");
   /*DG5_RndObjLoad(&Uni->Cow, "cow.object");*/
 } /* End of 'DG5_UnitInit' function */
 
@@ -71,7 +70,7 @@ static VOID DG5_UnitResponse( dg5UNIT_COW *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitRender( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndObjDraw(&Uni->Cow, MatrMulMatr(MatrRotateY(Uni->RotateY), MatrTranslate(VecSet1((DBL)Ani->Mz / 102))));
+  DG5_RndPrimDraw(&Uni->Cow, MatrMulMatr(MatrRotateY(Uni->RotateY), MatrTranslate(VecSet1((DBL)Ani->Mz / 102))));
   //DG5_RndObjDraw(&Uni->Cow, MatrRotateY(Ani->Time * 102));
 } /* End of 'DG5_UnitRender' function */
 

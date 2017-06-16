@@ -17,12 +17,11 @@
 
 
 /* Project parameters */
-extern DBL
+extern FLT
                        /* Project plane width */
   DG5_RndProjFarClip,       /* Project plane height */
   DG5_RndProjDist, /* Distance from viewer to project plane */
   DG5_RndProjSize; /* Prohect plane inner size */
-
 extern MATR
   DG5_RndMatrView, /* Viewer matrix */
   DG5_RndMatrProj; /* Projection Matrix */
@@ -64,7 +63,7 @@ typedef struct tagdg5PRIM
   INT VA, VBuf;
   INT IBuf;
 
-}dg5PRIM;
+} dg5PRIM;
 
 typedef struct tagdg5OBJ
 {
@@ -73,18 +72,22 @@ typedef struct tagdg5OBJ
 
 } dg5OBJ;
                                                                                                    
-
-                                                                                                   
-/* Save text to log file function.
+/* Load shader program function.
  * ARGUMENTS:
- *   - text 1 to save:
- *       CHAR *Stage;
- *   - text 2 to save:
- *       CHAR *Text;
+ *   - shader files prefix:
+ *       CHAR *FileNamePrefix;
+ * RETURNS:
+ *   (UINT) shader program index or 0 if error is occured.
+ */
+UINT DG5_RndShaderLoad( CHAR *FileNamePrefix );
+
+/* Shader program load function.
+ * ARGUMENTS:
+ *   - shader program Id:
+ *       UINT Prg;
  * RETURNS: None.
  */
-static VOID DG5_RndShaderLog( CHAR *Stage, CHAR *Text );
-
+VOID DG5_RndShaderFree( UINT Prg );
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -95,7 +98,7 @@ static VOID DG5_RndShaderLog( CHAR *Stage, CHAR *Text );
  * RETURNS:
  *   (BOOL) TRUE if success, FALSE otherwise.
  */
-BOOL DG5_RndObjLoad( dg5OBJ *Obj, CHAR *FileName );
+BOOL DG5_RndPrimLoad( dg5PRIM *Obj, CHAR *FileName );
 
 /* Object free memory function.
  * ARGUMENTS:
@@ -103,7 +106,7 @@ BOOL DG5_RndObjLoad( dg5OBJ *Obj, CHAR *FileName );
  *       dg5OBJ3D *Obj;
  * RETURNS: None.
  */
-VOID DG5_RndObjFree( dg5OBJ *Obj );
+VOID DG5_RndPrimFree( dg5PRIM *Obj );
 
 /* Object drawing function.
  * ARGUMENTS:
@@ -113,6 +116,12 @@ VOID DG5_RndObjFree( dg5OBJ *Obj );
  *       MATR M;
  * RETURNS: None.
  */
+VOID DG5_RndPrimDraw( dg5PRIM *Pr, MATR M );
+
+VOID DG5_RndObjCreate( dg5OBJ *Obj, INT NumOfP );
+
+VOID DG5_RndObjFree( dg5OBJ *Obj );
+
 VOID DG5_RndObjDraw( dg5OBJ *Obj, MATR M );
 
 #endif /* __RENDER_H_ */

@@ -111,6 +111,7 @@ VOID DG5_AnimRender( VOID )
 {
   INT i;
   LARGE_INTEGER t;
+  static DBL ShdTime;
   POINT pt;
 
   /*** Handle timer ***/

@@ -43,13 +43,25 @@ __inline FLT Rnd1()
   return sin(rand());    
 }
 
-__inline VEC VecSet( DBL X, DBL Y, DBL Z )
+__inline VEC VecSet( FLT X, FLT Y, FLT Z )
 {
   VEC v = {X, Y, Z};
   return v;
 }
 
-__inline VEC VecSet1( DBL X )
+ __inline VEC2 Vec2Set( FLT X, FLT Y)
+{
+  VEC2 v = {X, Y};
+  return v;
+}
+
+ __inline VEC4 Vec4Set( FLT X, FLT Y, FLT Z, FLT W )
+{
+  VEC4 v = {X, Y, Z, W};
+  return v;
+}                                  
+
+__inline VEC VecSet1( FLT X )
 {
   return VecSet(X, X, X);
 }
@@ -64,12 +76,12 @@ __inline VEC VecSubVec( VEC v1, VEC v2 )
   return VecSet(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
 }
 
-__inline VEC VecMulNum( VEC v, DBL n )
+__inline VEC VecMulNum( VEC v, FLT n )
 {
   return VecSet(v.X * n, v.Y * n, v.Z * n);
 }
 
-__inline VEC VecDivNum( VEC v, DBL n )
+__inline VEC VecDivNum( VEC v, FLT n )
 {
   return VecSet(v.X / n, v.Y / n, v.Z / n);
 }
@@ -79,7 +91,7 @@ __inline VEC VecNeg( VEC v )
   return VecSet(-v.X, -v.Y, -v.Z );
 }
 
-__inline DBL VecDotVec( VEC v1, VEC v2 )
+__inline FLT VecDotVec( VEC v1, VEC v2 )
 {
   return v1.X * v2.X + v1.Y * v2.Y + v1.Z * v2.Z;
 }
@@ -99,19 +111,19 @@ __inline MATR MatrIdentity( VOID )
   return UnitMatrix;
 }
 
-__inline DBL VecLen2( VEC v )
+__inline FLT VecLen2( VEC v )
 {
   return v.X * v.X + v.Y * v.Y + v.Z * v.Z;
 }
 
-__inline DBL VecLen( VEC v )
+__inline FLT VecLen( VEC v )
 {
   return sqrt(VecLen2(v));
 }
 
 __inline VEC VecNormalize( VEC v )
 {
-  DBL l = VecLen(v);
+  FLT l = VecLen(v);
 
   return VecSet(v.X / l, v.Y / l, v.Z / l);
 }
@@ -127,6 +139,11 @@ __inline MATR MatrMulMatr( MATR m1, MATR m2 )
         r.a[i][j] += m1.a[i][k] * m2.a[k][j];
   return r;
 }
+#define MatrMulMatr3(A, B, C)\
+  (MatrMulMatr(A, MatrMulMatr(B, C)))
+#define MatrMulMatr4(A, B, C, D)\
+  (MatrMulMatr(A, MatrMulMatr3(B, C, D)))
+
 
 __inline MATR MatrTranspose( MATR m )
 {
@@ -139,15 +156,15 @@ __inline MATR MatrTranspose( MATR m )
   return r;
 }
 
-__inline DBL MatrDeterm3x3( DBL a11, DBL a12, DBL a13,
-                            DBL a21, DBL a22, DBL a23,
-                            DBL a31, DBL a32, DBL a33)
+__inline FLT MatrDeterm3x3( FLT a11, FLT a12, FLT a13,
+                            FLT a21, FLT a22, FLT a23,
+                            FLT a31, FLT a32, FLT a33)
 {
   return a11 * a22 * a33 - a11 * a23 * a32 - a12 * a21 * a33 + 
          a12 * a23 * a31 + a13 * a21 * a32 - a13 * a22 * a31;
 }
 
-__inline DBL MatrDeterm( MATR m )
+__inline FLT MatrDeterm( MATR m )
 {
   return
     m.a[0][0] * MatrDeterm3x3(m.a[1][1], m.a[1][2], m.a[1][3], 
@@ -167,7 +184,7 @@ __inline DBL MatrDeterm( MATR m )
 __inline MATR MatrInverse( MATR m )
 {
   INT i, j, p[][3] = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}};
-  DBL det = MatrDeterm(m);
+  FLT det = MatrDeterm(m);
   MATR r;
 
   for(i = 0; i < 4; i++)
@@ -182,9 +199,9 @@ __inline MATR MatrInverse( MATR m )
 }
 
 /* function MatrRotate */
-__inline MATR MatrRotate(DBL AngleDeg, VEC v )
+__inline MATR MatrRotate(FLT AngleDeg, VEC v )
 {
-  DBL a = D2R(AngleDeg), si = sin(a), co = cos(a);
+  FLT a = D2R(AngleDeg), si = sin(a), co = cos(a);
   MATR m;
   VEC p = VecNormalize(v);
   
@@ -223,10 +240,10 @@ __inline MATR MatrScale( VEC s )
   return m;
 }
 
-__inline MATR MatrRotateZ( DBL AngleInDegree )
+__inline MATR MatrRotateZ( FLT AngleInDegree )
 {
   MATR m = UnitMatrix;
-  DBL a = D2R(AngleInDegree);
+  FLT a = D2R(AngleInDegree);
 
   m.a[0][0] = cos(a);
   m.a[0][1] = sin(a);
@@ -235,10 +252,10 @@ __inline MATR MatrRotateZ( DBL AngleInDegree )
   return m;
 }
 
-__inline MATR MatrRotateX( DBL AngleInDegree )
+__inline MATR MatrRotateX( FLT AngleInDegree )
 {
   MATR m = UnitMatrix;
-  DBL a = D2R(AngleInDegree);
+  FLT a = D2R(AngleInDegree);
 
   m.a[1][1] = cos(a);
   m.a[1][2] = sin(a);
@@ -247,10 +264,10 @@ __inline MATR MatrRotateX( DBL AngleInDegree )
   return m;
 }
 
-__inline MATR MatrRotateY( DBL AngleInDegree )
+__inline MATR MatrRotateY( FLT AngleInDegree )
 {
   MATR m = UnitMatrix;
-  DBL a = D2R(AngleInDegree);
+  FLT a = D2R(AngleInDegree);
 
   m.a[0][0] = cos(a);
   m.a[0][2] = -sin(a);
@@ -261,7 +278,7 @@ __inline MATR MatrRotateY( DBL AngleInDegree )
 
 __inline VEC VecMulMatr( VEC v, MATR m )
 {
-  DBL w =v.X * m.a[0][3] + v.Y * m.a[1][3] + v.Z * m.a[2][3] + m.a [3][3];
+  FLT w =v.X * m.a[0][3] + v.Y * m.a[1][3] + v.Z * m.a[2][3] + m.a [3][3];
 
   return VecSet((v.X * m.a[0][0] + v.Y * m.a[1][0] + v.Z * m.a[2][0] + m.a[3][0]) / w,
                 (v.X * m.a[0][1] + v.Y * m.a[1][1] + v.Z * m.a[2][1] + m.a[3][1]) / w,
@@ -312,14 +329,14 @@ __inline VEC VecMulMatr3( VEC V, MATR M )
 /* function PointTransform */
 __inline VEC PointTransform( VEC V, MATR M )
 {
-  DBL w = V.X * M.a[0][3] + V.Y * M.a[1][3] + V.Z * M.a[2][3] + M.a[3][3];
+  FLT w = V.X * M.a[0][3] + V.Y * M.a[1][3] + V.Z * M.a[2][3] + M.a[3][3];
 
   return VecSet((V.X * M.a[0][0] + V.Y * M.a[1][0] + V.Z * M.a[2][0] + M.a[3][0]) / w,
                 (V.X * M.a[0][1] + V.Y * M.a[1][1] + V.Z * M.a[2][1] + M.a[3][1]) / w,
                 (V.X * M.a[0][2] + V.Y * M.a[1][2] + V.Z * M.a[2][2] + M.a[3][2]) / w);
 } /* End of 'PointTransform' function */
 
-__inline MATR MatrFrustum( DBL l, DBL r, DBL b, DBL t, DBL n ,DBL f )
+__inline MATR MatrFrustum( FLT l, FLT r, FLT b, FLT t, FLT n ,FLT f )
 {
   MATR m = MatrIdentity();
   m.a[0][0] = 2 * n / (r - l);
