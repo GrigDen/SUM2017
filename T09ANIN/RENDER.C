@@ -22,6 +22,10 @@ MATR
 
 UINT 
   DG5_RndProgId; /* Shader program indentifier */
+VEC 
+  DG5_RndLightColor,
+  DG5_RndLightPos; 
+  
 
 /* Rendering system initialization function.
  * ARGUMENTS: None.
@@ -32,6 +36,9 @@ VOID DG5_RndInit( VOID )
   DG5_RndProjDist = 1;
   DG5_RndProjSize = 1;
   DG5_RndProjFarClip = 1000;
+                                        
+  DG5_RndLightColor = VecSet(1, 1, 1);
+  DG5_RndLightPos = VecSet(0, 0, 50);
 
   DG5_RndMatrView = MatrView(VecSet1(23), VecSet1(6), VecSet(0, 1, 0));
   glEnable(GL_DEPTH_TEST);

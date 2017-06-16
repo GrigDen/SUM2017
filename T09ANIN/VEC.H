@@ -16,6 +16,8 @@
 #define D2R(A) (A * PI / 180)
 #define Degree2Radian(a) D2R(a)
 
+
+
 typedef double DBL;
 typedef float FLT;
 typedef struct tagMATR
@@ -36,7 +38,7 @@ typedef struct tagVEC2
 typedef struct tagVEC4
 {
   FLT X, Y, Z, W;
-} VEC4;
+} VEC4;                                                
 
 __inline FLT Rnd1()
 {

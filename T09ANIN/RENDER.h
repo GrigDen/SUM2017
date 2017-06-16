@@ -27,6 +27,9 @@ extern MATR
   DG5_RndMatrProj; /* Projection Matrix */
 extern UINT 
   DG5_RndProgId; /* Shader program indentifier */
+extern VEC 
+  DG5_RndLightColor,
+  DG5_RndLightPos;
 
 /* Rendering system initialization function.
  * ARGUMENTS: None.

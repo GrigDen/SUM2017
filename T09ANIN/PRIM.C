@@ -126,6 +126,16 @@ VOID DG5_RndPrimDraw( dg5PRIM *Pr, MATR M )
   loc = glGetUniformLocation(DG5_RndProgId, "MatrW");
   if (loc != -1)
     glUniformMatrix4fv(loc, 1, FALSE, W.a[0]);
+  loc = glGetUniformLocation(DG5_RndProgId, "MatrV");
+  if (loc != -1)
+    glUniformMatrix4fv(loc, 1, FALSE, DG5_RndMatrView.a[0]);
+  loc = glGetUniformLocation(DG5_RndProgId, "LightPos");
+  if (loc != -1)
+    glUniform3fv(loc, 1, &DG5_RndLightPos.X);
+  loc = glGetUniformLocation(DG5_RndProgId, "LightColor");
+  if (loc != -1)
+    glUniform3fv(loc, 1, &DG5_RndLightColor.Y);
+
   loc = glGetUniformLocation(DG5_RndProgId, "Time");
   if (loc != -1)
     glUniform1f(loc, DG5_Anim.Time);

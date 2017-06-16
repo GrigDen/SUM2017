@@ -14,6 +14,8 @@
 typedef struct tagdg5UNIT_CONTROL
 {
   DG5_UNIT_BASE_FIELDS
+  DBL HRot, VRot;
+  DBL Dist;
 } dg5UNIT_CONTROL;
 
 /* Control unit initialization function.
@@ -50,6 +52,9 @@ static VOID DG5_UnitClose( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
 {
+  INT i;
+  VEC V;
+
   if (Ani->KeysClick[VK_ESCAPE])
     DG5_AnimDoExit();
   else if (Ani->KeysClick['F'])
@@ -60,6 +65,22 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   else if (Ani->KeysClick['W'])
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  
+  Uni->Dist += Ani->Mdz / 300.0;
+  Uni->HRot -= 80 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdx ;
+  Uni->VRot += 80 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdy;
+  if (Uni->VRot > 89)
+    Uni->VRot = 89;
+  if (Uni->VRot < -89)
+    Uni->VRot = -89; 
+  ///* Erorr is here *///   
+  V = VecSet(2, 2, Uni->Dist);
+  V = VecMulMatr43(V, MatrMulMatr(MatrRotateX(Uni->VRot), MatrRotateY(Uni->HRot)));
+  DG5_RndMatrView = MatrView(V, VecSet(0, 3, 0), VecSet(0, 1, 0));  
+
+  DG5_RndLightPos = VecAddVec(DG5_RndLightPos, VecMulNum(VecSet(Ani->Jx, Ani->Jy, Ani->Jz), 8 * Ani->GlobalDeltaTime));
+  if (Ani->JBut[2])
+    DG5_RndLightPos = VecSet(0, 8, 0);
 } /* End of 'DG5_UnitResponse' function */
 
 /* Control unit render function.
