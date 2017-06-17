@@ -29,7 +29,7 @@ typedef struct tagdg5UNIT_COW
  */
 static VOID DG5_UnitInit( dg5UNIT_COW *Uni, dg5ANIM *Ani )
 {
-  DG5_RndPrimLoad(&Uni->Cow, "cow.object");
+  DG5_RndPrimLoad(&Uni->Cow, "cow.objec"/*"bb8.obj"*/);
   /*DG5_RndObjLoad(&Uni->Cow, "cow.object");*/
 } /* End of 'DG5_UnitInit' function */
 

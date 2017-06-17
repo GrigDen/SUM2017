@@ -52,7 +52,6 @@ static VOID DG5_UnitClose( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
  */
 static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
 {
-  INT i;
   VEC V;
 
   if (Ani->KeysClick[VK_ESCAPE])
@@ -67,8 +66,8 @@ static VOID DG5_UnitResponse( dg5UNIT_CONTROL *Uni, dg5ANIM *Ani )
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   
   Uni->Dist += Ani->Mdz / 300.0;
-  Uni->HRot -= 80 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdx ;
-  Uni->VRot += 80 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdy;
+  Uni->HRot -= 8 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdx ;
+  Uni->VRot += 8 * 30 * Ani->GlobalDeltaTime * Ani->Keys[VK_LBUTTON] * Ani->Mdy;
   if (Uni->VRot > 89)
     Uni->VRot = 89;
   if (Uni->VRot < -89)

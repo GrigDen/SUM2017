@@ -28,6 +28,7 @@ VOID DG5_RndPrimCreate( dg5PRIM *Pr, BOOL IsTrimesh,
                         dg5VERTEX *V, INT NumOfV,
                         INT *I, INT NumOfI )
 {
+  memset(Pr, 0, sizeof(dg5PRIM));
   Pr->NumOfI = NumOfI;
   Pr->IsTrimesh = IsTrimesh;
   Pr->M = MatrIdentity();
@@ -106,7 +107,7 @@ VOID DG5_RndPrimFree( dg5PRIM *Pr )
  */
 VOID DG5_RndPrimDraw( dg5PRIM *Pr, MATR M )
 {
-  INT loc;
+  INT loc, prg;
   MATR W, WVP;
 
   W = MatrMulMatr(Pr->M, M);
@@ -119,27 +120,29 @@ VOID DG5_RndPrimDraw( dg5PRIM *Pr, MATR M )
   glEnable(GL_PRIMITIVE_RESTART);
   glPrimitiveRestartIndex(-1);
 
-  glUseProgram(DG5_RndProgId);
-  loc = glGetUniformLocation(DG5_RndProgId, "MatrWVP");
+  prg = DG5_RndMaterialApply(Pr->MtlNo);
+  /// glUseProgram(DG5_RndProgId);
+  loc = glGetUniformLocation(prg, "MatrWVP");
   if (loc != -1)
     glUniformMatrix4fv(loc, 1, FALSE, WVP.a[0]);
-  loc = glGetUniformLocation(DG5_RndProgId, "MatrW");
+  loc = glGetUniformLocation(prg, "MatrW");
   if (loc != -1)
     glUniformMatrix4fv(loc, 1, FALSE, W.a[0]);
-  loc = glGetUniformLocation(DG5_RndProgId, "MatrV");
+  loc = glGetUniformLocation(prg, "MatrV");
   if (loc != -1)
     glUniformMatrix4fv(loc, 1, FALSE, DG5_RndMatrView.a[0]);
-  loc = glGetUniformLocation(DG5_RndProgId, "LightPos");
+
+  loc = glGetUniformLocation(prg, "LightPos");
   if (loc != -1)
     glUniform3fv(loc, 1, &DG5_RndLightPos.X);
-  loc = glGetUniformLocation(DG5_RndProgId, "LightColor");
+  loc = glGetUniformLocation(prg, "LightColor");
   if (loc != -1)
-    glUniform3fv(loc, 1, &DG5_RndLightColor.Y);
+    glUniform3fv(loc, 1, &DG5_RndLightColor.X);
 
-  loc = glGetUniformLocation(DG5_RndProgId, "Time");
+  loc = glGetUniformLocation(prg, "Time");
   if (loc != -1)
     glUniform1f(loc, DG5_Anim.Time);
-  loc = glGetUniformLocation(DG5_RndProgId, "GTime");
+  loc = glGetUniformLocation(prg, "GTime");
   if (loc != -1)
     glUniform1f(loc, DG5_Anim.GlobalTime);
 
@@ -148,44 +151,6 @@ VOID DG5_RndPrimDraw( dg5PRIM *Pr, MATR M )
 
   glBindVertexArray(0);
 } /* Ens of 'DG5_RndPrimDraw' function */
-
-
-/* Evaluate trimesh vertex normals function.
- * ARGUMENTS:
- *   - vertex array:
- *       dg5VERTEX *V;
- *   - vertex array size:
- *       INT NumOfV;
- *   - index array:
- *       INT *I;
- *   - index array size:
- *       INT NumOfI;
- * RETURNS: None.
- */
-VOID DG5_RndTriMeshEvalNormals( dg5VERTEX *V, INT NumOfV, INT *I, INT NumOfI )
-{
-  INT i;
-
-  /* Set to zero all normals */
-  for (i = 0; i < NumOfV; i++)
-    V[i].N = VecSet1(0);
-
-  /* Evaluate all facets normals */
-  for (i = 0; i < NumOfI; i += 3)
-  {
-    dg5VERTEX *p0 = &V[I[i]], *p1 = &V[I[i + 1]], *p2 = &V[I[i + 2]];
-    VEC N = VecNormalize(VecCrossVec(VecSubVec(p1->P, p0->P), VecSubVec(p2->P, p0->P)));
-
-    /* Disperse normal to all three points */
-    p0->N = VecAddVec(p0->N, N);
-    p1->N = VecAddVec(p1->N, N);
-    p2->N = VecAddVec(p2->N, N);
-  }
-
-  /* Normalize all normals */
-  for (i = 0; i < NumOfV; i++)
-    V[i].N = VecNormalize(V[i].N);
-} /* End of 'DG5_RndTriMeshEvalNormals' function */
 
 /* Primitive load function.
  * ARGUMENTS:
@@ -264,7 +229,42 @@ BOOL DG5_RndPrimLoad( dg5PRIM *Obj, CHAR *FileName )
   return TRUE;
 } /* End of 'DG5_RndPrimLoad' function */
 
+/* Evaluate trimesh vertex normals function.
+ * ARGUMENTS:
+ *   - vertex array:
+ *       dg5VERTEX *V;
+ *   - vertex array size:
+ *       INT NumOfV;
+ *   - index array:
+ *       INT *I;
+ *   - index array size:
+ *       INT NumOfI;
+ * RETURNS: None.
+ */
+VOID DG5_RndTriMeshEvalNormals( dg5VERTEX *V, INT NumOfV, INT *I, INT NumOfI )
+{
+  INT i;
 
+  /* Set to zero all normals */
+  for (i = 0; i < NumOfV; i++)
+    V[i].N = VecSet1(0);
+
+  /* Evaluate all facets normals */
+  for (i = 0; i < NumOfI; i += 3)
+  {
+    dg5VERTEX *p0 = &V[I[i]], *p1 = &V[I[i + 1]], *p2 = &V[I[i + 2]];
+    VEC N = VecNormalize(VecCrossVec(VecSubVec(p1->P, p0->P), VecSubVec(p2->P, p0->P)));
+
+    /* Disperse normal to all three points */
+    p0->N = VecAddVec(p0->N, N);
+    p1->N = VecAddVec(p1->N, N);
+    p2->N = VecAddVec(p2->N, N);
+  }
+
+  /* Normalize all normals */
+  for (i = 0; i < NumOfV; i++)
+    V[i].N = VecNormalize(V[i].N);
+} /* End of 'DG5_RndTriMeshEvalNormals' function */
 
 /* Evaluate grid vertex normals function.
  * ARGUMENTS:
@@ -399,7 +399,7 @@ VOID DG5_RndPrimCreatePlane( dg5PRIM *Pr, VEC C, VEC Du, VEC Dv, INT N, INT M )
       p->N = Norm;
       p->P = VecAddVec(C,
         VecAddVec(VecMulNum(Du, j / (M - 1.0)), VecMulNum(Dv, i / (N - 1.0))));
-      p->P.Y += 18 * sin(j * 13.0) * cos(i * 13.0) + Rnd1();
+      //p->P.Y += 2 * sin(j * 13.0) * cos(i * 13.0);
       p->C = Vec4Set(0.18, 0.30, 0.08, 1);
       p->T = Vec2Set(j / (M - 1.0), i / (N - 1.0));
     }
